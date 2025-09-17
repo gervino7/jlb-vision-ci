@@ -1,20 +1,14 @@
 import React from 'react';
 import { Navigation } from '@/components/Navigation';
 import { HeroSection } from '@/components/HeroSection';
+import { GallerySection } from '@/components/GallerySection';
 
 const Index = () => {
   return (
     <div className="min-h-screen bg-background">
       <Navigation />
       <HeroSection />
-      
-      {/* Placeholder sections for future development */}
-      <div id="gallery" className="min-h-screen flex items-center justify-center bg-muted/30">
-        <div className="text-center">
-          <h2 className="text-4xl font-bold text-gradient-presidential mb-4">Galerie Photos</h2>
-          <p className="text-muted-foreground">Section à venir - Photos officielles, terrain, institutionnelles</p>
-        </div>
-      </div>
+      <GallerySection />
       
       <div id="audio" className="min-h-screen flex items-center justify-center">
         <div className="text-center">
