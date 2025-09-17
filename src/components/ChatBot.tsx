@@ -191,20 +191,20 @@ Sois direct, impactant et va à l'essentiel.`;
     <div className="fixed bottom-4 right-4 z-50">
       <Card className={cn(
         "transition-all duration-500 ease-in-out shadow-2xl border border-primary/30 backdrop-blur-2xl bg-white/95 dark:bg-gray-900/95",
-        isMinimized ? "w-80 h-16" : "w-[420px] h-[650px]",
+        isMinimized ? "w-72 h-14" : "w-[360px] h-[500px]",
         "hover:shadow-presidential"
       )}>
         {/* Header */}
-        <div className="flex items-center justify-between p-5 border-b border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
-          <div className="flex items-center gap-3">
-            <div className="w-12 h-12 rounded-2xl bg-gradient-presidential flex items-center justify-center shadow-lg">
-              <MessageSquare className="w-6 h-6 text-white" />
+        <div className="flex items-center justify-between p-3 border-b border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/5 to-secondary/5">
+          <div className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-xl bg-gradient-presidential flex items-center justify-center shadow-lg">
+              <MessageSquare className="w-5 h-5 text-white" />
             </div>
             <div>
-              <h3 className="font-bold text-lg text-foreground">Assistant JLB</h3>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 bg-green-500 rounded-full animate-pulse"></div>
-                <p className="text-sm text-muted-foreground font-medium">En ligne</p>
+              <h3 className="font-bold text-base text-foreground">Assistant JLB</h3>
+              <div className="flex items-center gap-1">
+                <div className="w-1.5 h-1.5 bg-green-500 rounded-full animate-pulse"></div>
+                <p className="text-xs text-muted-foreground font-medium">En ligne</p>
               </div>
             </div>
           </div>
@@ -231,8 +231,8 @@ Sois direct, impactant et va à l'essentiel.`;
         {!isMinimized && (
           <>
             {/* Messages */}
-            <ScrollArea className="flex-1 p-6 h-96">
-              <div className="space-y-6">
+            <ScrollArea className="flex-1 p-4 h-72">
+              <div className="space-y-4">
                 {messages.map((message) => (
                   <div
                     key={message.id}
@@ -243,7 +243,7 @@ Sois direct, impactant et va à l'essentiel.`;
                   >
                     <div
                       className={cn(
-                        "max-w-[85%] p-4 rounded-2xl text-sm font-medium leading-relaxed shadow-md transition-all duration-200 hover:shadow-lg",
+                        "max-w-[85%] p-3 rounded-xl text-sm font-medium leading-relaxed shadow-md transition-all duration-200 hover:shadow-lg",
                         message.isUser
                           ? "bg-gradient-presidential text-white rounded-br-md shadow-primary/20"
                           : "bg-white/80 text-gray-800 border border-gray-200/50 rounded-bl-md"
@@ -270,53 +270,53 @@ Sois direct, impactant et va à l'essentiel.`;
 
             {/* Quick Actions */}
             {messages.length <= 1 && (
-              <div className="p-6 border-t border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/3 to-secondary/3">
-                <p className="text-sm font-semibold text-foreground mb-4">Actions rapides</p>
-                <div className="grid grid-cols-2 gap-3">
+              <div className="p-4 border-t border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/3 to-secondary/3">
+                <p className="text-xs font-semibold text-foreground mb-3">Actions rapides</p>
+                <div className="grid grid-cols-2 gap-2">
                   {quickActions.map((action, index) => (
                     <Button
                       key={index}
                       variant="outline"
                       size="sm"
                       onClick={action.action}
-                      className="justify-start text-sm h-12 border-primary/20 hover:bg-gradient-presidential hover:text-white hover:border-primary transition-all duration-300 font-medium shadow-sm hover:shadow-md"
+                      className="justify-start text-xs h-10 border-primary/20 hover:bg-gradient-presidential hover:text-white hover:border-primary transition-all duration-300 font-medium shadow-sm hover:shadow-md"
                     >
-                      <action.icon className="w-4 h-4 mr-2" />
+                      <action.icon className="w-3 h-3 mr-1.5" />
                       {action.label}
                     </Button>
                   ))}
                 </div>
-                <Separator className="my-4" />
+                <Separator className="my-3" />
               </div>
             )}
 
             {/* Input */}
-            <div className="p-6 border-t border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/3 to-secondary/3">
-              <div className="flex gap-3">
+            <div className="p-4 border-t border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/3 to-secondary/3">
+              <div className="flex gap-2">
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
                   placeholder="Posez votre question..."
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
                   disabled={isLoading}
-                  className="flex-1 h-12 bg-white/80 border-gray-200/50 rounded-xl px-4 text-sm font-medium focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
+                  className="flex-1 h-10 bg-white/80 border-gray-200/50 rounded-lg px-3 text-sm font-medium focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
                 />
                 <Button
                   variant={isListening ? "destructive" : "outline"}
                   size="icon"
                   onClick={isListening ? stopListening : startListening}
                   disabled={isLoading}
-                  className="w-12 h-12 rounded-xl border-primary/20 hover:bg-primary/10 transition-all duration-300"
+                  className="w-10 h-10 rounded-lg border-primary/20 hover:bg-primary/10 transition-all duration-300"
                 >
-                  {isListening ? <MicOff className="w-5 h-5" /> : <Mic className="w-5 h-5" />}
+                  {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                 </Button>
                 <Button
                   onClick={() => sendMessage()}
                   disabled={!inputValue.trim() || isLoading}
-                  className="w-12 h-12 bg-gradient-presidential hover:scale-105 rounded-xl shadow-lg hover:shadow-presidential transition-all duration-300"
+                  className="w-10 h-10 bg-gradient-presidential hover:scale-105 rounded-lg shadow-lg hover:shadow-presidential transition-all duration-300"
                   size="icon"
                 >
-                  <Send className="w-5 h-5" />
+                  <Send className="w-4 h-4" />
                 </Button>
               </div>
             </div>
