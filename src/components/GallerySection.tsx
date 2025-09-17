@@ -4,6 +4,15 @@ import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X, ZoomIn } from 'lucide-react';
 import portraitImage from '@/assets/jean-louis-billon-portrait.jpg';
+import footballImage from '@/assets/jlb-football-sifca.jpg';
+import ordinateurImage from '@/assets/jlb-remise-ordinateur.jpg';
+import diplomeImage from '@/assets/jlb-remise-diplome.jpg';
+import femmesImage from '@/assets/jlb-femmes-traditionnelles.jpg';
+import salonSifcaImage from '@/assets/jlb-salon-sifca.jpg';
+import salonCommercialImage from '@/assets/jlb-salon-commercial.jpg';
+import meetingImage from '@/assets/jlb-meeting-plein-air.jpg';
+import reunionInstImage from '@/assets/jlb-reunion-institutionnelle.jpg';
+import supportersImage from '@/assets/jlb-supporters-campagne.jpg';
 
 interface GalleryImage {
   id: string;
@@ -25,43 +34,75 @@ const galleryImages: GalleryImage[] = [
   },
   {
     id: '2',
-    src: portraitImage,
-    alt: 'Jean Louis Billon en visite terrain',
-    category: 'terrain',
-    title: 'Visite des plantations SIFCA',
-    description: 'Rencontre avec les agriculteurs et producteurs'
+    src: meetingImage,
+    alt: 'Jean Louis Billon en meeting de campagne',
+    category: 'officiel',
+    title: 'Meeting de campagne en plein air',
+    description: 'Discours public lors d\'un rassemblement politique'
   },
   {
     id: '3',
-    src: portraitImage,
-    alt: 'Jean Louis Billon - Ministre du Commerce',
-    category: 'institutionnel',
-    title: 'En fonction de Ministre',
-    description: 'Période ministérielle 2012-2017'
+    src: supportersImage,
+    alt: 'Supporters de Jean Louis Billon',
+    category: 'officiel',
+    title: 'Supporters en action',
+    description: 'Militant arborant le portrait du candidat lors d\'un meeting'
   },
   {
     id: '4',
-    src: portraitImage,
-    alt: 'Jean Louis Billon et sa famille',
-    category: 'familial',
-    title: 'Moments en famille',
-    description: 'Avec son épouse Henriette Gomis'
+    src: footballImage,
+    alt: 'Jean Louis Billon en maillot SIFCA',
+    category: 'terrain',
+    title: 'Match de football SIFCA',
+    description: 'Participation à un événement sportif du groupe SIFCA'
   },
   {
     id: '5',
-    src: portraitImage,
-    alt: 'Jean Louis Billon - Conférence internationale',
-    category: 'international',
-    title: 'Conférence économique',
-    description: 'Forum international des affaires'
+    src: ordinateurImage,
+    alt: 'Jean Louis Billon - Remise d\'ordinateurs',
+    category: 'terrain',
+    title: 'Remise d\'équipements informatiques',
+    description: 'Action sociale - Don d\'ordinateurs HP aux jeunes'
   },
   {
     id: '6',
-    src: portraitImage,
-    alt: 'Jean Louis Billon - Meeting politique',
-    category: 'officiel',
-    title: 'Meeting de campagne',
-    description: 'Rassemblement politique à Abidjan'
+    src: femmesImage,
+    alt: 'Jean Louis Billon avec des femmes en tenues traditionnelles',
+    category: 'terrain',
+    title: 'Rencontre avec les femmes de Côte d\'Ivoire',
+    description: 'Échange avec les femmes en tenues traditionnelles ivoiriennes'
+  },
+  {
+    id: '7',
+    src: diplomeImage,
+    alt: 'Jean Louis Billon - Remise de diplôme',
+    category: 'institutionnel',
+    title: 'Cérémonie de remise de diplômes',
+    description: 'Remise d\'un certificat de gratitude lors d\'une cérémonie officielle'
+  },
+  {
+    id: '8',
+    src: reunionInstImage,
+    alt: 'Jean Louis Billon en réunion institutionnelle',
+    category: 'institutionnel',
+    title: 'Réunion avec les forces de sécurité',
+    description: 'Rencontre officielle avec les responsables sécuritaires'
+  },
+  {
+    id: '9',
+    src: salonSifcaImage,
+    alt: 'Jean Louis Billon au salon SIFCA',
+    category: 'international',
+    title: 'Salon international SIFCA',
+    description: 'Présentation du groupe SIFCA lors d\'un salon professionnel'
+  },
+  {
+    id: '10',
+    src: salonCommercialImage,
+    alt: 'Jean Louis Billon dans un salon commercial',
+    category: 'international',
+    title: 'Salon commercial international',
+    description: 'Visite d\'un salon avec les produits du groupe SIFCA'
   }
 ];
 
