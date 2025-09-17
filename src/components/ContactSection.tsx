@@ -1,11 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
-import { MessageCircle, Send, Phone, Mail, MapPin } from 'lucide-react';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { MessageCircle, Send, Phone, Mail, MapPin, Calendar } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 
 interface FormData {
@@ -18,6 +19,7 @@ interface FormData {
 export const ContactSection = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState('message');
 
   const onSubmit = (data: FormData) => {
     // Simuler l'envoi du formulaire
@@ -53,87 +55,158 @@ export const ContactSection = () => {
         </div>
 
         <div className="grid lg:grid-cols-2 gap-12 max-w-7xl mx-auto">
-          {/* Formulaire de contact */}
+          {/* Formulaire de contact avec onglets */}
           <Card className="glass-card p-8 border-primary/20 shadow-presidential hover:shadow-glow transition-all duration-500">
-            <div className="mb-8">
-              <h3 className="text-2xl font-bold text-primary mb-3">Envoyez-nous un message</h3>
-              <p className="text-muted-foreground">
-                Partagez vos préoccupations, suggestions ou questions. Chaque message est important pour nous.
-              </p>
-            </div>
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="grid w-full grid-cols-2 mb-8">
+                <TabsTrigger 
+                  value="message" 
+                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <Send className="h-4 w-4" />
+                  Message
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="appointment" 
+                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                >
+                  <Calendar className="h-4 w-4" />
+                  Rendez-vous
+                </TabsTrigger>
+              </TabsList>
 
-            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-              <div className="grid md:grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <Label htmlFor="name" className="text-sm font-medium">Nom complet *</Label>
-                  <Input
-                    id="name"
-                    {...register('name', { required: 'Le nom est requis' })}
-                    className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20"
-                    placeholder="Votre nom complet"
-                  />
-                  {errors.name && (
-                    <p className="text-sm text-destructive">{errors.name.message}</p>
-                  )}
+              <TabsContent value="message" className="space-y-6">
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-primary mb-3">Envoyez-nous un message</h3>
+                  <p className="text-muted-foreground">
+                    Partagez vos préoccupations, suggestions ou questions. Chaque message est important pour nous.
+                  </p>
                 </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="email" className="text-sm font-medium">Email *</Label>
-                  <Input
-                    id="email"
-                    type="email"
-                    {...register('email', { 
-                      required: 'L\'email est requis',
-                      pattern: {
-                        value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                        message: 'Adresse email invalide'
-                      }
-                    })}
-                    className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20"
-                    placeholder="votre.email@exemple.com"
-                  />
-                  {errors.email && (
-                    <p className="text-sm text-destructive">{errors.email.message}</p>
-                  )}
+
+                <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="name" className="text-sm font-medium">Nom complet *</Label>
+                      <Input
+                        id="name"
+                        {...register('name', { required: 'Le nom est requis' })}
+                        className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20"
+                        placeholder="Votre nom complet"
+                      />
+                      {errors.name && (
+                        <p className="text-sm text-destructive">{errors.name.message}</p>
+                      )}
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="email" className="text-sm font-medium">Email *</Label>
+                      <Input
+                        id="email"
+                        type="email"
+                        {...register('email', { 
+                          required: 'L\'email est requis',
+                          pattern: {
+                            value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+                            message: 'Adresse email invalide'
+                          }
+                        })}
+                        className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20"
+                        placeholder="votre.email@exemple.com"
+                      />
+                      {errors.email && (
+                        <p className="text-sm text-destructive">{errors.email.message}</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="subject" className="text-sm font-medium">Sujet *</Label>
+                    <Input
+                      id="subject"
+                      {...register('subject', { required: 'Le sujet est requis' })}
+                      className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20"
+                      placeholder="Objet de votre message"
+                    />
+                    {errors.subject && (
+                      <p className="text-sm text-destructive">{errors.subject.message}</p>
+                    )}
+                  </div>
+
+                  <div className="space-y-2">
+                    <Label htmlFor="message" className="text-sm font-medium">Message *</Label>
+                    <Textarea
+                      id="message"
+                      rows={6}
+                      {...register('message', { required: 'Le message est requis' })}
+                      className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20 resize-none"
+                      placeholder="Votre message détaillé..."
+                    />
+                    {errors.message && (
+                      <p className="text-sm text-destructive">{errors.message.message}</p>
+                    )}
+                  </div>
+
+                  <Button 
+                    type="submit" 
+                    size="lg" 
+                    className="w-full btn-shine bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
+                  >
+                    <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
+                    Envoyer le message
+                  </Button>
+                </form>
+              </TabsContent>
+
+              <TabsContent value="appointment" className="space-y-6">
+                <div className="mb-6">
+                  <h3 className="text-2xl font-bold text-primary mb-3">Réserver un rendez-vous</h3>
+                  <p className="text-muted-foreground">
+                    Planifiez une rencontre directe avec Jean-Louis Billon pour discuter de vos préoccupations.
+                  </p>
                 </div>
-              </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="subject" className="text-sm font-medium">Sujet *</Label>
-                <Input
-                  id="subject"
-                  {...register('subject', { required: 'Le sujet est requis' })}
-                  className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20"
-                  placeholder="Objet de votre message"
-                />
-                {errors.subject && (
-                  <p className="text-sm text-destructive">{errors.subject.message}</p>
-                )}
-              </div>
+                <div className="space-y-4">
+                  <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20">
+                    <div className="flex items-center gap-3 mb-4">
+                      <Calendar className="h-6 w-6 text-primary" />
+                      <h4 className="font-semibold text-foreground">Calendly - Réservation en ligne</h4>
+                    </div>
+                    <p className="text-muted-foreground mb-4">
+                      Choisissez un créneau qui vous convient et réservez directement votre rendez-vous.
+                    </p>
+                    <Button 
+                      size="lg"
+                      className="w-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
+                      onClick={() => {
+                        // Ouvrir Calendly dans un nouvel onglet
+                        window.open('https://calendly.com/jeanllouisbillon', '_blank', 'noopener,noreferrer');
+                      }}
+                    >
+                      <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                      Réserver un rendez-vous
+                    </Button>
+                  </div>
 
-              <div className="space-y-2">
-                <Label htmlFor="message" className="text-sm font-medium">Message *</Label>
-                <Textarea
-                  id="message"
-                  rows={6}
-                  {...register('message', { required: 'Le message est requis' })}
-                  className="bg-background/80 border-primary/30 focus:border-primary focus:ring-primary/20 resize-none"
-                  placeholder="Votre message détaillé..."
-                />
-                {errors.message && (
-                  <p className="text-sm text-destructive">{errors.message.message}</p>
-                )}
-              </div>
-
-              <Button 
-                type="submit" 
-                size="lg" 
-                className="w-full btn-shine bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
-              >
-                <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                Envoyer le message
-              </Button>
-            </form>
+                  <div className="bg-gradient-to-r from-secondary/10 to-accent/10 rounded-lg p-6 border border-secondary/20">
+                    <h4 className="font-semibold text-foreground mb-2">Types de rendez-vous disponibles :</h4>
+                    <ul className="text-muted-foreground space-y-2">
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-primary rounded-full"></div>
+                        Consultation politique (30 min)
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-secondary rounded-full"></div>
+                        Rencontre économique (45 min)
+                      </li>
+                      <li className="flex items-center gap-2">
+                        <div className="w-2 h-2 bg-accent rounded-full"></div>
+                        Discussion communautaire (60 min)
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </TabsContent>
+            </Tabs>
           </Card>
 
           {/* Informations de contact et WhatsApp */}
