@@ -1,5 +1,6 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from 'https://esm.sh/@supabase/supabase-js@2';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -22,12 +23,24 @@ serve(async (req) => {
   }
 
   try {
-    // Obtenir la clé API OpenAI depuis les secrets Supabase
-    const openaiApiKey = Deno.env.get('ANTHROPIC_API_KEY');
-    
-    if (!openaiApiKey) {
+    // Initialiser le client Supabase
+    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
+    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
+    const supabase = createClient(supabaseUrl, supabaseServiceKey);
+
+    // Récupérer la clé API Anthropic depuis la table
+    const { data: keyData, error: keyError } = await supabase
+      .from('api_keys')
+      .select('value')
+      .eq('name', 'ANTHROPIC_API_KEY')
+      .single();
+
+    if (keyError || !keyData) {
+      console.error('Erreur récupération clé:', keyError);
       throw new Error('Clé API OpenAI non configurée');
     }
+
+    const openaiApiKey = keyData.value;
 
     // Obtenir l'IP du client pour le rate limiting
     const clientIP = req.headers.get('x-forwarded-for') || 'unknown';
