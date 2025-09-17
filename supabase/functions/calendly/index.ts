@@ -59,12 +59,12 @@ serve(async (req) => {
 
       case 'createScheduledEvent':
         // Créer un événement programmé (nécessite des permissions spéciales)
-        const { event_type, start_time: scheduledStart, invitee_email, invitee_name } = params;
+        const { event_type: eventTypeUri, start_time: scheduledStart, invitee_email, invitee_name } = params;
         response = await fetch('https://api.calendly.com/scheduled_events', {
           method: 'POST',
           headers,
           body: JSON.stringify({
-            event_type,
+            event_type: eventTypeUri,
             start_time: scheduledStart,
             invitee: {
               email: invitee_email,
