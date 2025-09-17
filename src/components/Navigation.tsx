@@ -1,10 +1,13 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Home, Image, Headphones, Video, Phone } from 'lucide-react';
+import { Menu, X, Home, Image, Headphones, Video, Phone, User } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { useNavigate, useLocation } from 'react-router-dom';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const navigate = useNavigate();
+  const location = useLocation();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -15,19 +18,35 @@ export const Navigation = () => {
   }, []);
 
   const navigationItems = [
-    { name: 'Accueil', href: '#home', icon: Home },
-    { name: 'Galerie', href: '#gallery', icon: Image },
-    { name: 'Audio', href: '#audio', icon: Headphones },
-    { name: 'Vidéo', href: '#video', icon: Video },
-    { name: 'Contact', href: '#contact', icon: Phone },
+    { name: 'Accueil', href: '/', icon: Home, type: 'route' },
+    { name: 'Portfolio', href: '/portfolio', icon: User, type: 'route' },
+    { name: 'Galerie', href: '#gallery', icon: Image, type: 'scroll' },
+    { name: 'Audio', href: '#audio', icon: Headphones, type: 'scroll' },
+    { name: 'Vidéo', href: '#video', icon: Video, type: 'scroll' },
+    { name: 'Contact', href: '#contact', icon: Phone, type: 'scroll' },
   ];
 
-  const scrollToSection = (href: string) => {
-    const element = document.querySelector(href);
-    if (element) {
-      element.scrollIntoView({ behavior: 'smooth' });
-    }
+  const handleNavigation = (href: string, type: string) => {
     setIsOpen(false);
+    
+    if (type === 'route') {
+      navigate(href);
+    } else if (type === 'scroll') {
+      if (location.pathname !== '/') {
+        navigate('/');
+        setTimeout(() => {
+          const element = document.querySelector(href);
+          if (element) {
+            element.scrollIntoView({ behavior: 'smooth' });
+          }
+        }, 100);
+      } else {
+        const element = document.querySelector(href);
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+        }
+      }
+    }
   };
 
   return (
@@ -37,23 +56,30 @@ export const Navigation = () => {
       <div className="container mx-auto px-4">
         <div className="flex items-center justify-between h-16">
           {/* Logo/Name */}
-          <div className="flex items-center space-x-3">
+          <button 
+            onClick={() => navigate('/')}
+            className="flex items-center space-x-3 hover:opacity-80 transition-opacity"
+          >
             <div className="w-10 h-10 bg-gradient-presidential rounded-full flex items-center justify-center">
               <span className="text-white font-bold text-lg">JLB</span>
             </div>
-            <div className="hidden sm:block">
+            <div className="hidden sm:block text-left">
               <h2 className="text-xl font-bold text-foreground">Jean Louis Billon</h2>
               <p className="text-sm text-primary">Candidat Présidentiel 2025</p>
             </div>
-          </div>
+          </button>
 
           {/* Desktop Navigation */}
           <div className="hidden md:flex items-center space-x-8">
             {navigationItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => scrollToSection(item.href)}
-                className="flex items-center space-x-2 text-foreground hover:text-primary transition-colors"
+                onClick={() => handleNavigation(item.href, item.type)}
+                className={`flex items-center space-x-2 transition-colors ${
+                  (item.type === 'route' && location.pathname === item.href) 
+                    ? 'text-primary font-semibold' 
+                    : 'text-foreground hover:text-primary'
+                }`}
               >
                 <item.icon className="w-4 h-4" />
                 <span>{item.name}</span>
@@ -66,7 +92,7 @@ export const Navigation = () => {
             <Button 
               variant="default" 
               className="btn-shine bg-gradient-presidential hover:shadow-glow"
-              onClick={() => scrollToSection('#contact')}
+              onClick={() => handleNavigation('#contact', 'scroll')}
             >
               Me Contacter
             </Button>
@@ -90,8 +116,12 @@ export const Navigation = () => {
             {navigationItems.map((item) => (
               <button
                 key={item.name}
-                onClick={() => scrollToSection(item.href)}
-                className="flex items-center space-x-3 w-full p-3 text-left text-foreground hover:text-primary hover:bg-muted/50 rounded-lg transition-colors"
+                onClick={() => handleNavigation(item.href, item.type)}
+                className={`flex items-center space-x-3 w-full p-3 text-left hover:bg-muted/50 rounded-lg transition-colors ${
+                  (item.type === 'route' && location.pathname === item.href) 
+                    ? 'text-primary font-semibold bg-muted/30' 
+                    : 'text-foreground hover:text-primary'
+                }`}
               >
                 <item.icon className="w-5 h-5" />
                 <span>{item.name}</span>
@@ -100,7 +130,7 @@ export const Navigation = () => {
             <Button 
               variant="default" 
               className="w-full mt-4 btn-shine bg-gradient-presidential"
-              onClick={() => scrollToSection('#contact')}
+              onClick={() => handleNavigation('#contact', 'scroll')}
             >
               Me Contacter
             </Button>
