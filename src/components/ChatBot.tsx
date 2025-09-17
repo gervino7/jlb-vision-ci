@@ -239,8 +239,12 @@ Réponds toujours en français et adapte ton langage au niveau de ton interlocut
               className="w-full"
             />
             <Button 
-              onClick={() => setHasApiKey(true)} 
-              disabled={!apiKey}
+              onClick={() => {
+                if (apiKey.trim()) {
+                  setHasApiKey(true);
+                }
+              }} 
+              disabled={!apiKey.trim()}
               className="w-full bg-primary hover:bg-primary/90"
             >
               Activer l'assistant
