@@ -4,7 +4,6 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquare, Send, Mic, MicOff, Phone, Calendar, Users, Building2, X, Minimize2, Maximize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -27,7 +26,6 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
   const [isListening, setIsListening] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [apiKey, setApiKey] = useState('');
-  const [apiProvider, setApiProvider] = useState<'openai' | 'anthropic'>('openai');
   const [hasApiKey, setHasApiKey] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -119,7 +117,6 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
         body: JSON.stringify({
           message: messageToSend,
           apiKey: apiKey,
-          apiProvider: apiProvider,
           systemPrompt: getSystemPrompt()
         }),
       });
@@ -238,20 +235,11 @@ Réponds toujours en français et adapte ton langage au niveau de ton interlocut
           </div>
             <div className="space-y-4">
               <p className="text-sm text-muted-foreground">
-                Choisissez votre provider IA et entrez votre clé API :
+                Entrez votre clé API Anthropic Claude :
               </p>
-              <Select value={apiProvider} onValueChange={(value: 'openai' | 'anthropic') => setApiProvider(value)}>
-                <SelectTrigger className="w-full">
-                  <SelectValue placeholder="Choisir le provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="openai">OpenAI (GPT-4o-mini)</SelectItem>
-                  <SelectItem value="anthropic">Anthropic (Claude Haiku)</SelectItem>
-                </SelectContent>
-              </Select>
               <Input
                 type="password"
-                placeholder={apiProvider === 'openai' ? 'sk-...' : 'sk-ant-...'}
+                placeholder="sk-ant-..."
                 value={apiKey}
                 onChange={(e) => setApiKey(e.target.value)}
                 className="w-full"
@@ -265,7 +253,7 @@ Réponds toujours en français et adapte ton langage au niveau de ton interlocut
                 disabled={!apiKey.trim()}
                 className="w-full bg-primary hover:bg-primary/90"
               >
-                Activer l'assistant
+                Activer l'assistant Claude
               </Button>
             </div>
         </Card>
