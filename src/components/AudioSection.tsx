@@ -3,6 +3,7 @@ import { Play, Pause, Volume2, SkipBack, SkipForward, Download } from 'lucide-re
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Slider } from '@/components/ui/slider';
+import { AppointmentCTA } from '@/components/AppointmentCTA';
 
 interface AudioItem {
   id: string;
@@ -380,6 +381,22 @@ export const AudioSection = () => {
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+
+        {/* Appointment CTA */}
+        <div className="mt-16 max-w-6xl mx-auto">
+          <div className="grid lg:grid-cols-2 gap-8">
+            <AppointmentCTA 
+              title="Continuons la conversation"
+              description="Ces podcasts vous ont intéressé ? Échangeons directement sur les sujets qui vous tiennent à cœur."
+              buttonText="Échanger en direct"
+            />
+            <AppointmentCTA 
+              title="Interview personnalisée"
+              description="Vous êtes journaliste ou créateur de contenu ? Organisez votre propre interview avec Jean-Louis Billon."
+              buttonText="Demander une interview"
+            />
           </div>
         </div>
       </div>

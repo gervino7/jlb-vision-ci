@@ -87,12 +87,30 @@ export const HeroSection = () => {
               <Button 
                 variant="outline" 
                 size="lg"
-                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground"
+                className="border-primary text-primary hover:bg-primary hover:text-primary-foreground group"
                 onClick={() => scrollToSection('#contact')}
               >
-                <Users className="mr-2 w-5 h-5" />
+                <Users className="mr-2 w-5 h-5 group-hover:scale-110 transition-transform" />
                 Rejoindre le mouvement
               </Button>
+            </div>
+
+            {/* Quick Appointment CTA */}
+            <div className="mt-6 p-6 glass-card border-secondary/30">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="font-semibold text-foreground mb-1">Besoin d'échanger directement ?</h3>
+                  <p className="text-sm text-muted-foreground">Réservez un rendez-vous personnalisé</p>
+                </div>
+                <Button
+                  size="sm"
+                  className="bg-gradient-to-r from-secondary to-secondary hover:shadow-glow group"
+                  onClick={() => scrollToSection('#contact')}
+                >
+                  <span className="mr-2">📅</span>
+                  Prendre RDV
+                </Button>
+              </div>
             </div>
           </div>
 

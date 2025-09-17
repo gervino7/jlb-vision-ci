@@ -9,6 +9,8 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { MessageCircle, Send, Phone, Mail, MapPin, Calendar, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { useCalendly } from '@/hooks/useCalendly';
+import { AppointmentTypes } from '@/components/AppointmentTypes';
+import { CalendlyWidget } from '@/components/CalendlyWidget';
 
 interface FormData {
   name: string;
@@ -21,6 +23,7 @@ export const ContactSection = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('message');
+  const [selectedAppointmentUrl, setSelectedAppointmentUrl] = useState<string>('');
   const { loading, eventTypes, getEventTypes, openCalendlyPopup } = useCalendly();
 
   const onSubmit = (data: FormData) => {
@@ -65,7 +68,7 @@ export const ContactSection = () => {
           {/* Formulaire de contact avec onglets */}
           <Card className="glass-card p-8 border-primary/20 shadow-presidential hover:shadow-glow transition-all duration-500">
             <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-              <TabsList className="grid w-full grid-cols-2 mb-8">
+              <TabsList className="grid w-full grid-cols-3 mb-8">
                 <TabsTrigger 
                   value="message" 
                   className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
@@ -78,7 +81,15 @@ export const ContactSection = () => {
                   className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
                 >
                   <Calendar className="h-4 w-4" />
-                  Rendez-vous
+                  Types de RDV
+                </TabsTrigger>
+                <TabsTrigger 
+                  value="calendly" 
+                  className="flex items-center gap-2 data-[state=active]:bg-primary data-[state=active]:text-primary-foreground"
+                  disabled={!selectedAppointmentUrl}
+                >
+                  <Calendar className="h-4 w-4" />
+                  Réserver
                 </TabsTrigger>
               </TabsList>
 
@@ -166,104 +177,43 @@ export const ContactSection = () => {
 
               <TabsContent value="appointment" className="space-y-6">
                 <div className="mb-6">
-                  <h3 className="text-2xl font-bold text-primary mb-3">Réserver un rendez-vous</h3>
+                  <h3 className="text-2xl font-bold text-primary mb-3">Choisissez votre type de rendez-vous</h3>
                   <p className="text-muted-foreground">
-                    Planifiez une rencontre directe avec Jean-Louis Billon pour discuter de vos préoccupations.
+                    Sélectionnez le type de rencontre qui correspond le mieux à vos besoins et objectifs.
                   </p>
                 </div>
 
-                <div className="space-y-4">
-                  {/* Liste des types d'événements depuis l'API Calendly */}
-                  {loading ? (
-                    <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20">
-                      <div className="flex items-center justify-center">
-                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
-                        <span className="ml-3 text-muted-foreground">Chargement des créneaux disponibles...</span>
-                      </div>
-                    </div>
-                  ) : eventTypes.length > 0 ? (
-                    <>
-                      {eventTypes.map((eventType, index) => (
-                        <div 
-                          key={eventType.uri} 
-                          className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20 hover:border-primary/40 transition-colors duration-300"
-                        >
-                          <div className="flex items-start justify-between mb-4">
-                            <div className="flex items-center gap-3">
-                              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-                                index === 0 ? 'bg-primary text-primary-foreground' :
-                                index === 1 ? 'bg-secondary text-secondary-foreground' :
-                                'bg-accent text-accent-foreground'
-                              }`}>
-                                <Calendar className="h-5 w-5" />
-                              </div>
-                              <div>
-                                <h4 className="font-semibold text-foreground">{eventType.name}</h4>
-                                {eventType.description_plain && (
-                                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
-                                    {eventType.description_plain}
-                                  </p>
-                                )}
-                              </div>
-                            </div>
-                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                              <Clock className="h-4 w-4" />
-                              <span>{eventType.duration} min</span>
-                            </div>
-                          </div>
+                <AppointmentTypes 
+                  onSelectAppointment={(url) => {
+                    setSelectedAppointmentUrl(url);
+                    setActiveTab('calendly');
+                  }} 
+                />
+              </TabsContent>
 
-                          <Button 
-                            size="lg"
-                            className="w-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
-                            onClick={() => openCalendlyPopup(eventType.booking_url)}
-                          >
-                            <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                            Réserver ce type de rendez-vous
-                          </Button>
-                        </div>
-                      ))}
-                    </>
-                  ) : (
-                    <>
-                      {/* Fallback avec bouton générique si l'API n'est pas configurée */}
-                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20">
-                        <div className="flex items-center gap-3 mb-4">
-                          <Calendar className="h-6 w-6 text-primary" />
-                          <h4 className="font-semibold text-foreground">Calendly - Réservation en ligne</h4>
-                        </div>
-                        <p className="text-muted-foreground mb-4">
-                          Choisissez un créneau qui vous convient et réservez directement votre rendez-vous.
-                        </p>
-                        <Button 
-                          size="lg"
-                          className="w-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
-                          onClick={() => openCalendlyPopup('https://calendly.com/jeanllouisbillon')}
-                        >
-                          <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                          Réserver un rendez-vous
-                        </Button>
-                      </div>
-
-                      <div className="bg-gradient-to-r from-secondary/10 to-accent/10 rounded-lg p-6 border border-secondary/20">
-                        <h4 className="font-semibold text-foreground mb-2">Types de rendez-vous disponibles :</h4>
-                        <ul className="text-muted-foreground space-y-2">
-                          <li className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-primary rounded-full"></div>
-                            Consultation politique (30 min)
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                            Rencontre économique (45 min)
-                          </li>
-                          <li className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-accent rounded-full"></div>
-                            Discussion communautaire (60 min)
-                          </li>
-                        </ul>
-                      </div>
-                    </>
-                  )}
-                </div>
+              <TabsContent value="calendly" className="space-y-6">
+                {selectedAppointmentUrl ? (
+                  <CalendlyWidget 
+                    url={selectedAppointmentUrl}
+                    className="border-primary/30"
+                  />
+                ) : (
+                  <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-12 border border-primary/20 text-center">
+                    <Calendar className="h-16 w-16 text-primary mx-auto mb-4" />
+                    <h3 className="text-xl font-semibold text-foreground mb-2">
+                      Sélectionnez d'abord un type de rendez-vous
+                    </h3>
+                    <p className="text-muted-foreground mb-6">
+                      Retournez à l'onglet "Types de RDV" pour choisir le type de rencontre qui vous convient.
+                    </p>
+                    <Button 
+                      onClick={() => setActiveTab('appointment')}
+                      className="bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential"
+                    >
+                      Choisir un type de rendez-vous
+                    </Button>
+                  </div>
+                )}
               </TabsContent>
             </Tabs>
           </Card>

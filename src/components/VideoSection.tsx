@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Play, ExternalLink } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { AppointmentCTA } from '@/components/AppointmentCTA';
 
 interface Video {
   id: string;
@@ -214,6 +215,17 @@ export const VideoSection = () => {
           <p className="text-sm text-muted-foreground mt-4 opacity-80">
             Plus de contenu vidéo disponible sur la chaîne officielle
           </p>
+        </div>
+
+        {/* Appointment CTA */}
+        <div className="mt-16 max-w-4xl mx-auto">
+          <AppointmentCTA 
+            variant="inline"
+            title="Questions après avoir vu ces interviews ?"
+            description="Réservez un entretien pour approfondir les sujets qui vous intéressent"
+            buttonText="Prendre RDV"
+            className="shadow-presidential"
+          />
         </div>
       </div>
     </section>

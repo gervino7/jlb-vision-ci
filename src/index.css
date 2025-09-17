@@ -182,4 +182,15 @@
   .shadow-glow {
     box-shadow: var(--shadow-glow);
   }
+  
+  /* Calendly Widget Styles */
+  .calendly-inline-widget {
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: var(--shadow-elegant);
+  }
+  
+  .calendly-badge-widget {
+    display: none !important;
+  }
 }

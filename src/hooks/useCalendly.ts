@@ -140,6 +140,28 @@ export const useCalendly = () => {
     document.body.appendChild(modal);
   };
 
+  // Fonction pour créer un widget Calendly inline
+  const createInlineWidget = (containerId: string, url: string) => {
+    const container = document.getElementById(containerId);
+    if (!container) return;
+
+    // Nettoyer le contenu existant
+    container.innerHTML = '';
+
+    // Créer l'iframe Calendly
+    const iframe = document.createElement('iframe');
+    iframe.src = url;
+    iframe.style.width = '100%';
+    iframe.style.height = '700px';
+    iframe.style.border = 'none';
+    iframe.style.borderRadius = '12px';
+    iframe.style.overflow = 'hidden';
+    iframe.title = 'Calendly - Réserver un rendez-vous';
+    iframe.allow = 'camera; microphone; display-capture';
+
+    container.appendChild(iframe);
+  };
+
   return {
     loading,
     eventTypes,
@@ -147,6 +169,7 @@ export const useCalendly = () => {
     getEventTypes,
     getAvailableTimes,
     getUserInfo,
-    openCalendlyPopup
+    openCalendlyPopup,
+    createInlineWidget
   };
 };

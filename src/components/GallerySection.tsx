@@ -3,6 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X, ZoomIn } from 'lucide-react';
+import { AppointmentCTA } from '@/components/AppointmentCTA';
 import portraitImage from '@/assets/jean-louis-billon-portrait-officiel.jpg';
 import footballImage from '@/assets/jlb-football-sifca.jpg';
 import ordinateurImage from '@/assets/jlb-remise-ordinateur.jpg';
@@ -233,6 +234,17 @@ export const GallerySection = () => {
             </div>
           </div>
         )}
+
+        {/* CTA Section */}
+        <div className="mt-16">
+          <AppointmentCTA 
+            variant="banner"
+            title="Parlons ensemble de l'avenir de la Côte d'Ivoire"
+            description="Ces moments capturés reflètent ma vision et mon engagement. Discutons de la façon dont nous pouvons ensemble construire un avenir meilleur pour notre pays."
+            buttonText="Échanger avec Jean-Louis Billon"
+            className="bg-gradient-to-r from-primary/10 via-background to-secondary/10"
+          />
+        </div>
       </div>
     </section>
   );
