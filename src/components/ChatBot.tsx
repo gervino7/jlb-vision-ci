@@ -4,9 +4,11 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { MessageSquare, Send, Mic, MicOff, Phone, Calendar, Users, Building2, X, Minimize2, Maximize2 } from 'lucide-react';
+import { MessageSquare, Send, Mic, MicOff, Phone, Calendar, Users, Building2, X, Minimize2, Maximize2, LogIn } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import { useAuth } from '@/hooks/useAuth';
+import { useNavigate } from 'react-router-dom';
 
 interface Message {
   id: string;
@@ -21,6 +23,8 @@ interface ChatBotProps {
 }
 
 export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
+  const { user } = useAuth();
+  const navigate = useNavigate();
   const [messages, setMessages] = useState<Message[]>([]);
   const [inputValue, setInputValue] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -39,16 +43,18 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
 
   useEffect(() => {
     if (isOpen && messages.length === 0) {
-      // Message d'accueil automatique
+      // Message d'accueil basé sur l'authentification
       const welcomeMessage: Message = {
         id: Date.now().toString(),
-        content: "Bonjour ! Assistant de Jean-Louis Billon, candidat président. Comment puis-je vous aider aujourd'hui ?",
+        content: user 
+          ? "Bonjour ! Assistant de Jean-Louis Billon, candidat président. Comment puis-je vous aider aujourd'hui ?"
+          : "Bonjour ! Pour utiliser le chat avec l'assistant de Jean-Louis Billon, veuillez vous connecter.",
         isUser: false,
         timestamp: new Date()
       };
       setMessages([welcomeMessage]);
     }
-  }, [isOpen]);
+  }, [isOpen, user]);
 
   const initializeSpeechRecognition = () => {
     if ('webkitSpeechRecognition' in window || 'SpeechRecognition' in window) {
@@ -94,7 +100,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
 
   const sendMessage = async (message?: string) => {
     const messageToSend = message || inputValue.trim();
-    if (!messageToSend || isLoading) return;
+    if (!messageToSend || isLoading || !user) return;
 
     // Validation de sécurité côté client
     if (messageToSend.length > 4000) {
@@ -269,7 +275,7 @@ Sois direct, impactant et va à l'essentiel.`;
             </ScrollArea>
 
             {/* Quick Actions */}
-            {messages.length <= 1 && (
+            {messages.length <= 1 && user && (
               <div className="p-4 border-t border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/3 to-secondary/3">
                 <p className="text-xs font-semibold text-foreground mb-3">Actions rapides</p>
                 <div className="grid grid-cols-2 gap-2">
@@ -290,29 +296,49 @@ Sois direct, impactant et va à l'essentiel.`;
               </div>
             )}
 
+            {/* Authentication prompt for non-authenticated users */}
+            {!user && (
+              <div className="p-4 border-t border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/3 to-secondary/3">
+                <div className="text-center space-y-3">
+                  <p className="text-sm text-muted-foreground">Connectez-vous pour accéder au chat</p>
+                  <Button
+                    onClick={() => {
+                      onToggle();
+                      navigate('/auth');
+                    }}
+                    className="w-full bg-gradient-presidential hover:scale-105 shadow-lg hover:shadow-presidential transition-all duration-300"
+                  >
+                    <LogIn className="w-4 h-4 mr-2" />
+                    Se connecter
+                  </Button>
+                </div>
+                <Separator className="my-3" />
+              </div>
+            )}
+
             {/* Input */}
             <div className="p-4 border-t border-gradient-to-r from-primary/20 to-secondary/20 bg-gradient-to-r from-primary/3 to-secondary/3">
               <div className="flex gap-2">
                 <Input
                   value={inputValue}
                   onChange={(e) => setInputValue(e.target.value)}
-                  placeholder="Posez votre question..."
+                  placeholder={user ? "Posez votre question..." : "Connectez-vous pour utiliser le chat"}
                   onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
-                  disabled={isLoading}
+                  disabled={isLoading || !user}
                   className="flex-1 h-10 bg-white/80 border-gray-200/50 rounded-lg px-3 text-sm font-medium focus:border-primary focus:ring-2 focus:ring-primary/20 shadow-sm"
                 />
                 <Button
                   variant={isListening ? "destructive" : "outline"}
                   size="icon"
                   onClick={isListening ? stopListening : startListening}
-                  disabled={isLoading}
+                  disabled={isLoading || !user}
                   className="w-10 h-10 rounded-lg border-primary/20 hover:bg-primary/10 transition-all duration-300"
                 >
                   {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
                 </Button>
                 <Button
                   onClick={() => sendMessage()}
-                  disabled={!inputValue.trim() || isLoading}
+                  disabled={!inputValue.trim() || isLoading || !user}
                   className="w-10 h-10 bg-gradient-presidential hover:scale-105 rounded-lg shadow-lg hover:shadow-presidential transition-all duration-300"
                   size="icon"
                 >

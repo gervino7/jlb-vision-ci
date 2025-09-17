@@ -1,13 +1,34 @@
 import React, { useState, useEffect } from 'react';
-import { Menu, X, Home, Image, Headphones, Video, Phone, User } from 'lucide-react';
+import { Menu, X, Home, Image, Headphones, Video, Phone, User, LogIn, LogOut } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useNavigate, useLocation } from 'react-router-dom';
+import { useAuth } from '@/hooks/useAuth';
+import { useToast } from '@/hooks/use-toast';
 
 export const Navigation = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const navigate = useNavigate();
   const location = useLocation();
+  const { user, signOut } = useAuth();
+  const { toast } = useToast();
+
+  const handleSignOut = async () => {
+    const { error } = await signOut();
+    if (error) {
+      toast({
+        title: "Erreur",
+        description: "Impossible de se déconnecter",
+        variant: "destructive",
+      });
+    } else {
+      toast({
+        title: "Déconnexion réussie",
+        description: "À bientôt !",
+      });
+      navigate('/');
+    }
+  };
 
   useEffect(() => {
     const handleScroll = () => {
@@ -85,6 +106,35 @@ export const Navigation = () => {
                 <span>{item.name}</span>
               </button>
             ))}
+            
+            {/* Authentication Controls */}
+            {user ? (
+              <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-2 text-sm text-muted-foreground">
+                  <User className="w-4 h-4" />
+                  <span className="hidden lg:block">{user.email}</span>
+                </div>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={handleSignOut}
+                  className="flex items-center space-x-2"
+                >
+                  <LogOut className="w-4 h-4" />
+                  <span>Déconnexion</span>
+                </Button>
+              </div>
+            ) : (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => navigate('/auth')}
+                className="flex items-center space-x-2"
+              >
+                <LogIn className="w-4 h-4" />
+                <span>Connexion</span>
+              </Button>
+            )}
           </div>
 
           {/* CTA Button */}
@@ -127,7 +177,42 @@ export const Navigation = () => {
                 <span>{item.name}</span>
               </button>
             ))}
-            <Button 
+            
+            {/* Authentication Controls for Mobile */}
+            {user ? (
+              <>
+                <div className="flex items-center space-x-3 p-3 text-left bg-muted/30 rounded-lg mt-2">
+                  <User className="w-5 h-5 text-primary" />
+                  <div>
+                    <p className="text-sm font-medium">{user.email}</p>
+                    <p className="text-xs text-muted-foreground">Connecté</p>
+                  </div>
+                </div>
+                <button
+                  onClick={() => {
+                    handleSignOut();
+                    setIsOpen(false);
+                  }}
+                  className="flex items-center space-x-3 w-full p-3 text-left hover:bg-muted/50 rounded-lg transition-colors text-foreground hover:text-primary"
+                >
+                  <LogOut className="w-5 h-5" />
+                  <span>Déconnexion</span>
+                </button>
+              </>
+            ) : (
+              <button
+                onClick={() => {
+                  navigate('/auth');
+                  setIsOpen(false);
+                }}
+                className="flex items-center space-x-3 w-full p-3 text-left hover:bg-muted/50 rounded-lg transition-colors text-foreground hover:text-primary"
+              >
+                <LogIn className="w-5 h-5" />
+                <span>Connexion</span>
+              </button>
+            )}
+            
+            <Button
               variant="default" 
               className="w-full mt-4 btn-shine bg-gradient-presidential"
               onClick={() => handleNavigation('#contact', 'scroll')}
