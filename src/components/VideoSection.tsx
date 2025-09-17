@@ -65,6 +65,8 @@ const videos: Video[] = [
 
 export const VideoSection = () => {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
+  // Éviter les doublons: on ne garde qu'une vidéo par youtubeId
+  const uniqueVideos: Video[] = Array.from(new Map(videos.map(v => [v.youtubeId, v])).values());
 
   const handlePlayVideo = (videoId: string, youtubeId: string) => {
     setActiveVideo(videoId);
@@ -96,8 +98,8 @@ export const VideoSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 max-w-7xl mx-auto">
-          {videos.map((video, index) => (
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 max-w-7xl mx-auto">
+          {uniqueVideos.map((video, index) => (
             <div 
               key={video.id} 
               className="group animate-fade-in"
@@ -113,6 +115,7 @@ export const VideoSection = () => {
                           src={`https://www.youtube.com/embed/${video.youtubeId}?autoplay=1`}
                           title={video.title}
                           className="w-full h-full"
+                          loading="lazy"
                           allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                           allowFullScreen
                         />
@@ -125,6 +128,8 @@ export const VideoSection = () => {
                         <img
                           src={video.thumbnail}
                           alt={video.title}
+                          loading="lazy"
+                          decoding="async"
                           className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                           onError={(e) => {
                             const target = e.target as HTMLImageElement;
@@ -146,9 +151,9 @@ export const VideoSection = () => {
                             <Button
                               onClick={() => handlePlayVideo(video.id, video.youtubeId)}
                               size="lg"
-                              className="relative bg-white/15 hover:bg-white/25 backdrop-blur-md border-2 border-white/30 hover:border-white/50 text-white rounded-full w-20 h-20 p-0 transition-all duration-300 hover:scale-110 group-hover:shadow-2xl group-hover:shadow-primary/30"
+                              className="relative bg-white/15 hover:bg-white/25 backdrop-blur-md border-2 border-white/30 hover:border-white/50 text-white rounded-full w-16 h-16 p-0 transition-all duration-300 hover:scale-110 group-hover:shadow-2xl group-hover:shadow-primary/30"
                             >
-                              <Play className="w-8 h-8 ml-1" fill="currentColor" />
+                              <Play className="w-7 h-7 ml-1" fill="currentColor" />
                             </Button>
                           </div>
                         </div>
@@ -169,12 +174,12 @@ export const VideoSection = () => {
                   </div>
 
                   {/* Content section with enhanced design */}
-                  <div className="p-6 relative">
+                  <div className="p-4 relative">
                     {/* Background gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5 rounded-b-lg" />
                     
                     <div className="relative z-10">
-                      <h3 className="text-xl font-bold mb-3 text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
+                      <h3 className="text-lg font-bold mb-3 text-foreground group-hover:text-primary transition-colors leading-tight line-clamp-2">
                         {video.title}
                       </h3>
                       <p className="text-muted-foreground mb-6 leading-relaxed line-clamp-3">
