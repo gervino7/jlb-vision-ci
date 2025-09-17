@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { MessageSquare, Send, Mic, MicOff, Phone, Calendar, Users, Building2, X, Minimize2, Maximize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
@@ -26,6 +27,7 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
   const [isListening, setIsListening] = useState(false);
   const [isMinimized, setIsMinimized] = useState(false);
   const [apiKey, setApiKey] = useState('');
+  const [apiProvider, setApiProvider] = useState<'openai' | 'anthropic'>('openai');
   const [hasApiKey, setHasApiKey] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
@@ -109,27 +111,60 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/api/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          message: messageToSend,
-          apiKey: apiKey,
-          context: getSystemPrompt()
-        }),
-      });
+      let response;
+      
+      if (apiProvider === 'openai') {
+        response = await fetch('https://api.openai.com/v1/chat/completions', {
+          method: 'POST',
+          headers: {
+            'Authorization': `Bearer ${apiKey}`,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            model: 'gpt-4o-mini',
+            messages: [
+              { role: 'system', content: getSystemPrompt() },
+              { role: 'user', content: messageToSend }
+            ],
+            temperature: 0.7,
+            max_tokens: 500,
+          }),
+        });
+      } else {
+        response = await fetch('https://api.anthropic.com/v1/messages', {
+          method: 'POST',
+          headers: {
+            'x-api-key': apiKey,
+            'Content-Type': 'application/json',
+            'anthropic-version': '2023-06-01',
+          },
+          body: JSON.stringify({
+            model: 'claude-3-5-haiku-20241022',
+            max_tokens: 500,
+            system: getSystemPrompt(),
+            messages: [
+              { role: 'user', content: messageToSend }
+            ],
+          }),
+        });
+      }
 
       if (!response.ok) {
         throw new Error('Erreur de communication');
       }
 
       const data = await response.json();
+      let botResponse;
+      
+      if (apiProvider === 'openai') {
+        botResponse = data.choices[0].message.content;
+      } else {
+        botResponse = data.content[0].text;
+      }
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: botResponse,
         isUser: false,
         timestamp: new Date()
       };
@@ -228,28 +263,39 @@ Réponds toujours en français et adapte ton langage au niveau de ton interlocut
                 <X className="w-4 h-4" />
               </Button>
             </div>
-            <p className="text-sm text-muted-foreground">
-              Pour activer l'assistant, veuillez entrer votre clé API OpenAI :
-            </p>
-            <Input
-              type="password"
-              placeholder="sk-..."
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-              className="w-full"
-            />
-            <Button 
-              onClick={() => {
-                if (apiKey.trim()) {
-                  setHasApiKey(true);
-                }
-              }} 
-              disabled={!apiKey.trim()}
-              className="w-full bg-primary hover:bg-primary/90"
-            >
-              Activer l'assistant
-            </Button>
           </div>
+            <div className="space-y-4">
+              <p className="text-sm text-muted-foreground">
+                Choisissez votre provider IA et entrez votre clé API :
+              </p>
+              <Select value={apiProvider} onValueChange={(value: 'openai' | 'anthropic') => setApiProvider(value)}>
+                <SelectTrigger className="w-full">
+                  <SelectValue placeholder="Choisir le provider" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="openai">OpenAI (GPT-4o-mini)</SelectItem>
+                  <SelectItem value="anthropic">Anthropic (Claude Haiku)</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                type="password"
+                placeholder={apiProvider === 'openai' ? 'sk-...' : 'sk-ant-...'}
+                value={apiKey}
+                onChange={(e) => setApiKey(e.target.value)}
+                className="w-full"
+              />
+              <Button 
+                onClick={() => {
+                  if (apiKey.trim()) {
+                    setHasApiKey(true);
+                  }
+                }} 
+                disabled={!apiKey.trim()}
+                className="w-full bg-primary hover:bg-primary/90"
+              >
+                Activer l'assistant
+              </Button>
+            </div>
         </Card>
       </div>
     );
