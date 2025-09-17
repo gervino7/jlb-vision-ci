@@ -27,10 +27,10 @@ const galleryImages: GalleryImage[] = [
   {
     id: '1',
     src: portraitImage,
-    alt: 'Jean Louis Billon - Portrait officiel',
+    alt: 'Jean Louis Billon - Portrait officiel en tenue traditionnelle',
     category: 'officiel',
-    title: 'Portrait officiel de campagne',
-    description: 'Photo officielle pour la campagne présidentielle 2025'
+    title: 'Portrait officiel en tenue traditionnelle',
+    description: 'Portrait présidentiel en grand boubou traditionnel ivoirien'
   },
   {
     id: '2',
