@@ -111,60 +111,32 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
     setIsLoading(true);
 
     try {
-      let response;
-      
-      if (apiProvider === 'openai') {
-        response = await fetch('https://api.openai.com/v1/chat/completions', {
-          method: 'POST',
-          headers: {
-            'Authorization': `Bearer ${apiKey}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            model: 'gpt-4o-mini',
-            messages: [
-              { role: 'system', content: getSystemPrompt() },
-              { role: 'user', content: messageToSend }
-            ],
-            temperature: 0.7,
-            max_tokens: 500,
-          }),
-        });
-      } else {
-        response = await fetch('https://api.anthropic.com/v1/messages', {
-          method: 'POST',
-          headers: {
-            'x-api-key': apiKey,
-            'Content-Type': 'application/json',
-            'anthropic-version': '2023-06-01',
-          },
-          body: JSON.stringify({
-            model: 'claude-3-5-haiku-20241022',
-            max_tokens: 500,
-            system: getSystemPrompt(),
-            messages: [
-              { role: 'user', content: messageToSend }
-            ],
-          }),
-        });
-      }
+      const response = await fetch('/functions/v1/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: messageToSend,
+          apiKey: apiKey,
+          apiProvider: apiProvider,
+          systemPrompt: getSystemPrompt()
+        }),
+      });
 
       if (!response.ok) {
-        throw new Error('Erreur de communication');
+        throw new Error('Erreur de communication avec le serveur');
       }
 
       const data = await response.json();
-      let botResponse;
       
-      if (apiProvider === 'openai') {
-        botResponse = data.choices[0].message.content;
-      } else {
-        botResponse = data.content[0].text;
+      if (data.error) {
+        throw new Error(data.error);
       }
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: botResponse,
+        content: data.response,
         isUser: false,
         timestamp: new Date()
       };

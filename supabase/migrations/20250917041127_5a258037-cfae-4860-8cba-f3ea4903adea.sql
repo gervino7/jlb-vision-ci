@@ -1,0 +1,2 @@
+-- Création d'une edge function pour gérer le chat
+-- Cette fonction sera créée automatiquement par Supabase
