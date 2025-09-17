@@ -51,7 +51,7 @@ serve(async (req) => {
     }
     
     if (!apiKey || typeof apiKey !== 'string' || !apiKey.startsWith('sk-')) {
-      throw new Error('Clé API Anthropic invalide');
+      throw new Error('Clé API invalide');
     }
     
     if (message.length > 4000) {
