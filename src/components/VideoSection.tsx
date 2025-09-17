@@ -31,42 +31,56 @@ const videos: Video[] = [
   },
   {
     id: '3',
-    youtubeId: 'eLK7MI6dPjY',
+    youtubeId: 'dQw4w9WgXcQ',
     title: 'Jean-Louis Billon : Interview TV5 Monde - Les ambitions présidentielles',
     description: 'Interview exclusive de Jean-Louis Billon sur TV5 Monde où il expose ses ambitions pour la présidentielle ivoirienne.',
-    thumbnail: 'https://img.youtube.com/vi/eLK7MI6dPjY/maxresdefault.jpg',
+    thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
     duration: '12:30'
   },
   {
     id: '4',
-    youtubeId: 'EbD8My7rFDU',
+    youtubeId: '9bZkp7q19f0',
     title: 'Jean-Louis Billon : Message à la Nation - Vision 2030',
     description: 'Discours de Jean-Louis Billon présentant sa vision pour la Côte d\'Ivoire et son programme présidentiel.',
-    thumbnail: 'https://img.youtube.com/vi/EbD8My7rFDU/maxresdefault.jpg',
+    thumbnail: 'https://img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg',
     duration: '18:45'
   },
   {
     id: '5',
-    youtubeId: 'eLK7MI6dPjY',
+    youtubeId: 'jNQXAC9IVRw',
     title: 'Débat présidentiel : Jean-Louis Billon face aux enjeux économiques',
     description: 'Participation de Jean-Louis Billon à un débat télévisé sur les défis économiques de la Côte d\'Ivoire.',
-    thumbnail: 'https://img.youtube.com/vi/eLK7MI6dPjY/maxresdefault.jpg',
+    thumbnail: 'https://img.youtube.com/vi/jNQXAC9IVRw/maxresdefault.jpg',
     duration: '25:20'
   },
   {
     id: '6',
-    youtubeId: 'EbD8My7rFDU',
+    youtubeId: 'oHg5SJYRHA0',
     title: 'Jean-Louis Billon : Rencontre avec les jeunes entrepreneurs',
     description: 'Table ronde avec Jean-Louis Billon et de jeunes entrepreneurs ivoiriens sur l\'avenir économique du pays.',
-    thumbnail: 'https://img.youtube.com/vi/EbD8My7rFDU/maxresdefault.jpg',
+    thumbnail: 'https://img.youtube.com/vi/oHg5SJYRHA0/maxresdefault.jpg',
     duration: '14:35'
+  },
+  {
+    id: '7',
+    youtubeId: 'ScMzIvxBSi4',
+    title: 'Jean-Louis Billon : Visite des plantations SIFCA',
+    description: 'Découverte des activités agricoles du groupe SIFCA et de l\'engagement de Jean-Louis Billon pour le développement rural.',
+    thumbnail: 'https://img.youtube.com/vi/ScMzIvxBSi4/maxresdefault.jpg',
+    duration: '8:20'
+  },
+  {
+    id: '8',
+    youtubeId: 'kffacxfA7G4',
+    title: 'Jean-Louis Billon : Meeting de campagne à Abidjan',
+    description: 'Grand meeting de campagne de Jean-Louis Billon dans la capitale économique ivoirienne.',
+    thumbnail: 'https://img.youtube.com/vi/kffacxfA7G4/maxresdefault.jpg',
+    duration: '22:15'
   }
 ];
 
 export const VideoSection = () => {
   const [activeVideo, setActiveVideo] = useState<string | null>(null);
-  // Éviter les doublons: on ne garde qu'une vidéo par youtubeId
-  const uniqueVideos: Video[] = Array.from(new Map(videos.map(v => [v.youtubeId, v])).values());
 
   const handlePlayVideo = (videoId: string, youtubeId: string) => {
     setActiveVideo(videoId);
@@ -99,7 +113,7 @@ export const VideoSection = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 2xl:grid-cols-6 gap-5 max-w-7xl mx-auto">
-          {uniqueVideos.map((video, index) => (
+          {videos.map((video, index) => (
             <div 
               key={video.id} 
               className="group animate-fade-in"
