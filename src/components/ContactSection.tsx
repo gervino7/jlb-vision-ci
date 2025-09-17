@@ -11,6 +11,7 @@ import { useToast } from '@/hooks/use-toast';
 import { useCalendly } from '@/hooks/useCalendly';
 import { AppointmentTypes } from '@/components/AppointmentTypes';
 import { CalendlyWidget } from '@/components/CalendlyWidget';
+import { supabase } from '@/integrations/supabase/client';
 
 interface FormData {
   name: string;
@@ -24,16 +25,41 @@ export const ContactSection = () => {
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('message');
   const [selectedAppointmentUrl, setSelectedAppointmentUrl] = useState<string>('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const { loading, eventTypes, getEventTypes, openCalendlyPopup } = useCalendly();
 
-  const onSubmit = (data: FormData) => {
-    // Simuler l'envoi du formulaire
-    console.log('Form data:', data);
-    toast({
-      title: "Message envoyé!",
-      description: "Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.",
-    });
-    reset();
+  const onSubmit = async (data: FormData) => {
+    setIsSubmitting(true);
+    
+    try {
+      const { error } = await supabase
+        .from('contact_messages')
+        .insert({
+          name: data.name,
+          email: data.email,
+          subject: data.subject,
+          message: data.message
+        });
+
+      if (error) {
+        throw error;
+      }
+
+      toast({
+        title: "Message envoyé!",
+        description: "Votre message a été envoyé avec succès. Nous vous répondrons dans les plus brefs délais.",
+      });
+      reset();
+    } catch (error) {
+      console.error('Error sending message:', error);
+      toast({
+        title: "Erreur",
+        description: "Une erreur s'est produite lors de l'envoi de votre message. Veuillez réessayer.",
+        variant: "destructive",
+      });
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   // Charger les types d'événements Calendly au montage du composant
@@ -167,10 +193,11 @@ export const ContactSection = () => {
                   <Button 
                     type="submit" 
                     size="lg" 
-                    className="w-full btn-shine bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
+                    disabled={isSubmitting}
+                    className="w-full btn-shine bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group disabled:opacity-50"
                   >
                     <Send className="mr-2 h-5 w-5 group-hover:translate-x-1 transition-transform duration-300" />
-                    Envoyer le message
+                    {isSubmitting ? 'Envoi en cours...' : 'Envoyer le message'}
                   </Button>
                 </form>
               </TabsContent>
