@@ -23,7 +23,7 @@ serve(async (req) => {
 
   try {
     // Obtenir la clé API OpenAI depuis les secrets Supabase
-    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
+    const openaiApiKey = Deno.env.get('ANTHROPIC_API_KEY');
     
     if (!openaiApiKey) {
       throw new Error('Clé API OpenAI non configurée');
@@ -68,17 +68,18 @@ serve(async (req) => {
       throw new Error('System prompt doit être une chaîne de caractères');
     }
 
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${openaiApiKey}`,
+        'x-api-key': openaiApiKey,
         'Content-Type': 'application/json',
+        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'gpt-5-2025-08-07',
-        max_completion_tokens: 500,
+        model: 'claude-3-5-haiku-20241022',
+        max_tokens: 500,
+        system: systemPrompt,
         messages: [
-          { role: 'system', content: systemPrompt },
           { role: 'user', content: cleanMessage }
         ],
       }),
@@ -93,12 +94,12 @@ serve(async (req) => {
     const responseData = await response.json();
     
     // Validation de la réponse
-    if (!responseData.choices || !responseData.choices[0] || !responseData.choices[0].message || !responseData.choices[0].message.content) {
+    if (!responseData.content || !responseData.content[0] || !responseData.content[0].text) {
       throw new Error('Réponse API invalide');
     }
     
     // Nettoyage de la réponse
-    const cleanResponse = responseData.choices[0].message.content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    const cleanResponse = responseData.content[0].text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     
     return new Response(JSON.stringify({ 
       response: cleanResponse,
