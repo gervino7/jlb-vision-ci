@@ -4,7 +4,16 @@ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin'
 };
+
+// Rate limiting - simple in-memory store (pour démonstration)
+const rateLimitStore = new Map();
+const RATE_LIMIT_WINDOW = 60000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 10;
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -13,10 +22,47 @@ serve(async (req) => {
   }
 
   try {
+    // Obtenir l'IP du client pour le rate limiting
+    const clientIP = req.headers.get('x-forwarded-for') || 'unknown';
+    
+    // Vérifier le rate limiting
+    const now = Date.now();
+    const clientRequests = rateLimitStore.get(clientIP) || [];
+    const recentRequests = clientRequests.filter((time: number) => now - time < RATE_LIMIT_WINDOW);
+    
+    if (recentRequests.length >= RATE_LIMIT_MAX_REQUESTS) {
+      return new Response(JSON.stringify({ 
+        error: 'Trop de requêtes. Veuillez patienter avant de réessayer.' 
+      }), {
+        status: 429,
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+      });
+    }
+    
+    // Enregistrer cette requête
+    recentRequests.push(now);
+    rateLimitStore.set(clientIP, recentRequests);
+
     const { message, apiKey, systemPrompt } = await req.json();
 
-    if (!message || !apiKey) {
-      throw new Error('Missing required parameters');
+    // Validation des entrées
+    if (!message || typeof message !== 'string') {
+      throw new Error('Message requis et doit être une chaîne de caractères');
+    }
+    
+    if (!apiKey || typeof apiKey !== 'string' || !apiKey.startsWith('sk-')) {
+      throw new Error('Clé API Anthropic invalide');
+    }
+    
+    if (message.length > 4000) {
+      throw new Error('Message trop long (maximum 4000 caractères)');
+    }
+
+    // Nettoyage du message pour éviter les injections
+    const cleanMessage = message.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    
+    if (systemPrompt && typeof systemPrompt !== 'string') {
+      throw new Error('System prompt doit être une chaîne de caractères');
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -31,7 +77,7 @@ serve(async (req) => {
         max_tokens: 500,
         system: systemPrompt,
         messages: [
-          { role: 'user', content: message }
+          { role: 'user', content: cleanMessage }
         ],
       }),
     });
@@ -44,8 +90,16 @@ serve(async (req) => {
 
     const responseData = await response.json();
     
+    // Validation de la réponse
+    if (!responseData.content || !responseData.content[0] || !responseData.content[0].text) {
+      throw new Error('Réponse API invalide');
+    }
+    
+    // Nettoyage de la réponse
+    const cleanResponse = responseData.content[0].text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    
     return new Response(JSON.stringify({ 
-      response: responseData.content[0].text,
+      response: cleanResponse,
       provider: 'anthropic'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },

@@ -31,6 +31,30 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const recognitionRef = useRef<any>(null);
 
+  // Chiffrement simple pour l'API key
+  const encryptApiKey = (key: string): string => {
+    return btoa(key.split('').reverse().join(''));
+  };
+
+  const decryptApiKey = (encryptedKey: string): string => {
+    return atob(encryptedKey).split('').reverse().join('');
+  };
+
+  // Charger la clé API depuis le localStorage (chiffrée)
+  useEffect(() => {
+    const savedApiKey = localStorage.getItem('anthropic_api_key_enc');
+    if (savedApiKey) {
+      try {
+        const decryptedKey = decryptApiKey(savedApiKey);
+        setApiKey(decryptedKey);
+        setHasApiKey(true);
+      } catch (error) {
+        console.warn('Erreur de déchiffrement de la clé API');
+        localStorage.removeItem('anthropic_api_key_enc');
+      }
+    }
+  }, []);
+
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
@@ -97,6 +121,18 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
   const sendMessage = async (message?: string) => {
     const messageToSend = message || inputValue.trim();
     if (!messageToSend || isLoading || !hasApiKey) return;
+
+    // Validation de sécurité côté client
+    if (messageToSend.length > 4000) {
+      const errorMessage: Message = {
+        id: Date.now().toString(),
+        content: "Message trop long. Veuillez limiter votre message à 4000 caractères.",
+        isUser: false,
+        timestamp: new Date()
+      };
+      setMessages(prev => [...prev, errorMessage]);
+      return;
+    }
 
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -237,11 +273,13 @@ Réponds toujours en français et adapte ton langage au niveau de ton interlocut
               />
               <Button 
                 onClick={() => {
-                  if (apiKey.trim()) {
+                  if (apiKey.trim() && apiKey.startsWith('sk-ant-')) {
+                    // Sauvegarder la clé API chiffrée
+                    localStorage.setItem('anthropic_api_key_enc', encryptApiKey(apiKey));
                     setHasApiKey(true);
                   }
                 }} 
-                disabled={!apiKey.trim()}
+                disabled={!apiKey.trim() || !apiKey.startsWith('sk-ant-')}
                 className="w-full bg-primary hover:bg-primary/90"
               >
                 Activer l'assistant Claude
