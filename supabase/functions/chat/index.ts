@@ -22,11 +22,11 @@ serve(async (req) => {
   }
 
   try {
-    // Obtenir la clé API depuis les secrets Supabase
-    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    // Obtenir la clé API OpenAI depuis les secrets Supabase
+    const openaiApiKey = Deno.env.get('OPENAI_API_KEY');
     
-    if (!anthropicApiKey) {
-      throw new Error('Clé API Anthropic non configurée');
+    if (!openaiApiKey) {
+      throw new Error('Clé API OpenAI non configurée');
     }
 
     // Obtenir l'IP du client pour le rate limiting
@@ -68,18 +68,17 @@ serve(async (req) => {
       throw new Error('System prompt doit être une chaîne de caractères');
     }
 
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'x-api-key': anthropicApiKey,
+        'Authorization': `Bearer ${openaiApiKey}`,
         'Content-Type': 'application/json',
-        'anthropic-version': '2023-06-01',
       },
       body: JSON.stringify({
-        model: 'claude-3-5-haiku-20241022',
-        max_tokens: 500,
-        system: systemPrompt,
+        model: 'gpt-5-2025-08-07',
+        max_completion_tokens: 500,
         messages: [
+          { role: 'system', content: systemPrompt },
           { role: 'user', content: cleanMessage }
         ],
       }),
@@ -87,23 +86,23 @@ serve(async (req) => {
 
     if (!response.ok) {
       const errorData = await response.text();
-      console.error('Anthropic API Error:', errorData);
-      throw new Error(`Anthropic API Error: ${response.status}`);
+      console.error('OpenAI API Error:', errorData);
+      throw new Error(`OpenAI API Error: ${response.status}`);
     }
 
     const responseData = await response.json();
     
     // Validation de la réponse
-    if (!responseData.content || !responseData.content[0] || !responseData.content[0].text) {
+    if (!responseData.choices || !responseData.choices[0] || !responseData.choices[0].message || !responseData.choices[0].message.content) {
       throw new Error('Réponse API invalide');
     }
     
     // Nettoyage de la réponse
-    const cleanResponse = responseData.content[0].text.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+    const cleanResponse = responseData.choices[0].message.content.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
     
     return new Response(JSON.stringify({ 
       response: cleanResponse,
-      provider: 'anthropic'
+      provider: 'openai'
     }), {
       headers: { ...corsHeaders, 'Content-Type': 'application/json' },
     });
