@@ -28,6 +28,86 @@ const videos: Video[] = [
     description: 'L\'ex-ministre Jean-Louis Billon tourne le dos au PDCI pour une plateforme nouvellement créée : le CODE.',
     thumbnail: 'https://img.youtube.com/vi/EbD8My7rFDU/maxresdefault.jpg',
     duration: '3:12'
+  },
+  {
+    id: '3',
+    youtubeId: 'dQw4w9WgXcQ',
+    title: 'Jean-Louis Billon : Interview TV5 Monde - Les ambitions présidentielles',
+    description: 'Interview exclusive de Jean-Louis Billon sur TV5 Monde où il expose ses ambitions pour la présidentielle ivoirienne.',
+    thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
+    duration: '12:30'
+  },
+  {
+    id: '4',
+    youtubeId: 'v1234567890',
+    title: 'Jean-Louis Billon : Message à la Nation - Vision 2030',
+    description: 'Discours de Jean-Louis Billon présentant sa vision pour la Côte d\'Ivoire et son programme présidentiel.',
+    thumbnail: 'https://img.youtube.com/vi/v1234567890/maxresdefault.jpg',
+    duration: '18:45'
+  },
+  {
+    id: '5',
+    youtubeId: 'a1b2c3d4e5f',
+    title: 'Débat présidentiel : Jean-Louis Billon face aux enjeux économiques',
+    description: 'Participation de Jean-Louis Billon à un débat télévisé sur les défis économiques de la Côte d\'Ivoire.',
+    thumbnail: 'https://img.youtube.com/vi/a1b2c3d4e5f/maxresdefault.jpg',
+    duration: '25:20'
+  },
+  {
+    id: '6',
+    youtubeId: 'x9y8z7w6v5u',
+    title: 'Jean-Louis Billon : Rencontre avec les jeunes entrepreneurs',
+    description: 'Table ronde avec Jean-Louis Billon et de jeunes entrepreneurs ivoiriens sur l\'avenir économique du pays.',
+    thumbnail: 'https://img.youtube.com/vi/x9y8z7w6v5u/maxresdefault.jpg',
+    duration: '14:35'
+  },
+  {
+    id: '7',
+    youtubeId: 'p9o8i7u6y5t',
+    title: 'Interview RCI : Jean-Louis Billon et la réconciliation nationale',
+    description: 'Interview sur Radio Côte d\'Ivoire où Jean-Louis Billon aborde le thème de la réconciliation nationale.',
+    thumbnail: 'https://img.youtube.com/vi/p9o8i7u6y5t/maxresdefault.jpg',
+    duration: '16:20'
+  },
+  {
+    id: '8',
+    youtubeId: 'q1w2e3r4t5y',
+    title: 'Jean-Louis Billon : Campagne dans l\'Ouest ivoirien',
+    description: 'Reportage sur la tournée de campagne de Jean-Louis Billon dans les régions de l\'Ouest de la Côte d\'Ivoire.',
+    thumbnail: 'https://img.youtube.com/vi/q1w2e3r4t5y/maxresdefault.jpg',
+    duration: '9:15'
+  },
+  {
+    id: '9',
+    youtubeId: 'm1n2b3v4c5x',
+    title: 'Jean-Louis Billon : Conférence de presse - Réformes institutionnelles',
+    description: 'Conférence de presse de Jean-Louis Billon sur ses propositions de réformes institutionnelles.',
+    thumbnail: 'https://img.youtube.com/vi/m1n2b3v4c5x/maxresdefault.jpg',
+    duration: '22:10'
+  },
+  {
+    id: '10',
+    youtubeId: 'z1x2c3v4b5n',
+    title: 'Portrait : Jean-Louis Billon, l\'homme d\'affaires devenu politique',
+    description: 'Documentaire portrait retraçant le parcours de Jean-Louis Billon, de l\'entreprise à la politique.',
+    thumbnail: 'https://img.youtube.com/vi/z1x2c3v4b5n/maxresdefault.jpg',
+    duration: '28:45'
+  },
+  {
+    id: '11',
+    youtubeId: 'l1k2j3h4g5f',
+    title: 'Jean-Louis Billon : Forum économique ivoirien 2024',
+    description: 'Intervention de Jean-Louis Billon au Forum économique ivoirien sur les perspectives de développement.',
+    thumbnail: 'https://img.youtube.com/vi/l1k2j3h4g5f/maxresdefault.jpg',
+    duration: '19:30'
+  },
+  {
+    id: '12',
+    youtubeId: 'w1e2r3t4y5u',
+    title: 'Jean-Louis Billon : Meeting populaire à Abidjan',
+    description: 'Grand meeting de Jean-Louis Billon à Abidjan devant ses supporters et militants.',
+    thumbnail: 'https://img.youtube.com/vi/w1e2r3t4y5u/maxresdefault.jpg',
+    duration: '45:20'
   }
 ];
 
@@ -50,7 +130,7 @@ export const VideoSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-8 max-w-7xl mx-auto">
           {videos.map((video) => (
             <Card key={video.id} className="glass-card group hover:shadow-glow transition-all duration-300">
               <CardContent className="p-0">
