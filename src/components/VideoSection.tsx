@@ -16,67 +16,22 @@ const videos: Video[] = [
   {
     id: '1',
     youtubeId: 'eLK7MI6dPjY',
-    title: 'Présidentielle en Côte d\'Ivoire : Jean-Louis Billon dépose sa candidature',
-    description: 'À deux mois de l\'élection présidentielle ivoirienne, Jean-Louis Billon dépose sa candidature à la commission électorale.',
+    title: "Présidentielle en Côte d'Ivoire : Jean-Louis Billon dépose sa candidature",
+    description:
+      "À deux mois de l'élection présidentielle ivoirienne, Jean-Louis Billon dépose sa candidature à la commission électorale.",
     thumbnail: 'https://img.youtube.com/vi/eLK7MI6dPjY/maxresdefault.jpg',
-    duration: '2:45'
+    duration: '2:45',
   },
   {
     id: '2',
     youtubeId: 'EbD8My7rFDU',
-    title: 'Côte d\'Ivoire : l\'ex-ministre Jean-Louis Billon candidat à la présidentielle',
-    description: 'L\'ex-ministre Jean-Louis Billon tourne le dos au PDCI pour une plateforme nouvellement créée : le CODE.',
+    title:
+      "Côte d'Ivoire : l'ex-ministre Jean-Louis Billon candidat à la présidentielle",
+    description:
+      "L'ex-ministre Jean-Louis Billon tourne le dos au PDCI pour une plateforme nouvellement créée : le CODE.",
     thumbnail: 'https://img.youtube.com/vi/EbD8My7rFDU/maxresdefault.jpg',
-    duration: '3:12'
+    duration: '3:12',
   },
-  {
-    id: '3',
-    youtubeId: 'dQw4w9WgXcQ',
-    title: 'Jean-Louis Billon : Interview TV5 Monde - Les ambitions présidentielles',
-    description: 'Interview exclusive de Jean-Louis Billon sur TV5 Monde où il expose ses ambitions pour la présidentielle ivoirienne.',
-    thumbnail: 'https://img.youtube.com/vi/dQw4w9WgXcQ/maxresdefault.jpg',
-    duration: '12:30'
-  },
-  {
-    id: '4',
-    youtubeId: '9bZkp7q19f0',
-    title: 'Jean-Louis Billon : Message à la Nation - Vision 2030',
-    description: 'Discours de Jean-Louis Billon présentant sa vision pour la Côte d\'Ivoire et son programme présidentiel.',
-    thumbnail: 'https://img.youtube.com/vi/9bZkp7q19f0/maxresdefault.jpg',
-    duration: '18:45'
-  },
-  {
-    id: '5',
-    youtubeId: 'jNQXAC9IVRw',
-    title: 'Débat présidentiel : Jean-Louis Billon face aux enjeux économiques',
-    description: 'Participation de Jean-Louis Billon à un débat télévisé sur les défis économiques de la Côte d\'Ivoire.',
-    thumbnail: 'https://img.youtube.com/vi/jNQXAC9IVRw/maxresdefault.jpg',
-    duration: '25:20'
-  },
-  {
-    id: '6',
-    youtubeId: 'oHg5SJYRHA0',
-    title: 'Jean-Louis Billon : Rencontre avec les jeunes entrepreneurs',
-    description: 'Table ronde avec Jean-Louis Billon et de jeunes entrepreneurs ivoiriens sur l\'avenir économique du pays.',
-    thumbnail: 'https://img.youtube.com/vi/oHg5SJYRHA0/maxresdefault.jpg',
-    duration: '14:35'
-  },
-  {
-    id: '7',
-    youtubeId: 'ScMzIvxBSi4',
-    title: 'Jean-Louis Billon : Visite des plantations SIFCA',
-    description: 'Découverte des activités agricoles du groupe SIFCA et de l\'engagement de Jean-Louis Billon pour le développement rural.',
-    thumbnail: 'https://img.youtube.com/vi/ScMzIvxBSi4/maxresdefault.jpg',
-    duration: '8:20'
-  },
-  {
-    id: '8',
-    youtubeId: 'kffacxfA7G4',
-    title: 'Jean-Louis Billon : Meeting de campagne à Abidjan',
-    description: 'Grand meeting de campagne de Jean-Louis Billon dans la capitale économique ivoirienne.',
-    thumbnail: 'https://img.youtube.com/vi/kffacxfA7G4/maxresdefault.jpg',
-    duration: '22:15'
-  }
 ];
 
 export const VideoSection = () => {
@@ -188,7 +143,7 @@ export const VideoSection = () => {
                   </div>
 
                   {/* Content section with enhanced design */}
-                  <div className="p-4 relative">
+                  <div className="p-4 relative flex flex-col min-h-[220px]">
                     {/* Background gradient */}
                     <div className="absolute inset-0 bg-gradient-to-br from-transparent to-primary/5 rounded-b-lg" />
                     
@@ -201,11 +156,11 @@ export const VideoSection = () => {
                       </p>
                       
                       {/* Action buttons with enhanced styling */}
-                      <div className="flex gap-3">
+                      <div className="flex flex-wrap gap-3 mt-auto pt-2">
                         {activeVideo !== video.id && (
                           <Button
                             onClick={() => handlePlayVideo(video.id, video.youtubeId)}
-                            className="flex-1 bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02]"
+                            className="flex-1 min-w-[180px] bg-gradient-to-r from-primary to-primary/80 hover:from-primary/90 hover:to-primary text-white font-medium transition-all duration-300 hover:shadow-lg hover:shadow-primary/30 hover:scale-[1.02]"
                           >
                             <Play className="w-4 h-4 mr-2" />
                             Regarder
@@ -214,14 +169,14 @@ export const VideoSection = () => {
                         <Button
                           variant="outline"
                           asChild
-                          className="flex-shrink-0 bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
+                          className="flex-shrink-0 w-full sm:w-auto bg-background/50 backdrop-blur-sm border-primary/20 hover:border-primary/40 hover:bg-primary/5 transition-all duration-300"
                         >
                           <a
                             href={`https://www.youtube.com/watch?v=${video.youtubeId}`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="inline-flex items-center"
-                          >
+                             className="inline-flex items-center justify-center w-full sm:w-auto"
+                           >
                             <ExternalLink className="w-4 h-4 mr-2" />
                             YouTube
                           </a>
