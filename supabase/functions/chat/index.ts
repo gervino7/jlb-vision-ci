@@ -23,24 +23,12 @@ serve(async (req) => {
   }
 
   try {
-    // Initialiser le client Supabase
-    const supabaseUrl = Deno.env.get('SUPABASE_URL')!;
-    const supabaseServiceKey = Deno.env.get('SUPABASE_SERVICE_ROLE_KEY')!;
-    const supabase = createClient(supabaseUrl, supabaseServiceKey);
-
-    // Récupérer la clé API Anthropic depuis la table
-    const { data: keyData, error: keyError } = await supabase
-      .from('api_keys')
-      .select('value')
-      .eq('name', 'ANTHROPIC_API_KEY')
-      .single();
-
-    if (keyError || !keyData) {
-      console.error('Erreur récupération clé:', keyError);
-      throw new Error('Clé API OpenAI non configurée');
+    // Récupérer la clé API Anthropic depuis les variables d'environnement
+    const openaiApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    
+    if (!openaiApiKey) {
+      throw new Error('Clé API Anthropic non configurée');
     }
-
-    const openaiApiKey = keyData.value;
 
     // Obtenir l'IP du client pour le rate limiting
     const clientIP = req.headers.get('x-forwarded-for') || 'unknown';
