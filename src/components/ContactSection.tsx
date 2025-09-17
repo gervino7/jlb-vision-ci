@@ -237,10 +237,7 @@ export const ContactSection = () => {
                         <Button 
                           size="lg"
                           className="w-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
-                          onClick={() => {
-                            // Ouvrir Calendly dans un nouvel onglet
-                            window.open('https://calendly.com/jeanllouisbillon', '_blank', 'noopener,noreferrer');
-                          }}
+                          onClick={() => openCalendlyPopup('https://calendly.com/jeanllouisbillon')}
                         >
                           <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
                           Réserver un rendez-vous

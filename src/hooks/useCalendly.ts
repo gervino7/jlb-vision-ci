@@ -86,16 +86,58 @@ export const useCalendly = () => {
     }
   };
 
-  // Fonction pour ouvrir le widget Calendly en popup
+  // Fonction pour ouvrir le widget Calendly en popup intégré
   const openCalendlyPopup = (eventTypeUrl: string) => {
-    if (typeof window !== 'undefined' && (window as any).Calendly) {
-      (window as any).Calendly.initPopupWidget({
-        url: eventTypeUrl
-      });
-    } else {
-      // Fallback: ouvrir dans un nouvel onglet
-      window.open(eventTypeUrl, '_blank', 'noopener,noreferrer');
-    }
+    // Créer un iframe dans un modal pour éviter de quitter la page
+    const modal = document.createElement('div');
+    modal.style.position = 'fixed';
+    modal.style.top = '0';
+    modal.style.left = '0';
+    modal.style.width = '100%';
+    modal.style.height = '100%';
+    modal.style.backgroundColor = 'rgba(0, 0, 0, 0.8)';
+    modal.style.zIndex = '9999';
+    modal.style.display = 'flex';
+    modal.style.alignItems = 'center';
+    modal.style.justifyContent = 'center';
+
+    const iframe = document.createElement('iframe');
+    iframe.src = eventTypeUrl;
+    iframe.style.width = '90%';
+    iframe.style.height = '90%';
+    iframe.style.maxWidth = '800px';
+    iframe.style.maxHeight = '600px';
+    iframe.style.border = 'none';
+    iframe.style.borderRadius = '8px';
+    iframe.style.backgroundColor = 'white';
+
+    const closeButton = document.createElement('button');
+    closeButton.innerHTML = '✕';
+    closeButton.style.position = 'absolute';
+    closeButton.style.top = '10px';
+    closeButton.style.right = '10px';
+    closeButton.style.background = 'white';
+    closeButton.style.border = 'none';
+    closeButton.style.borderRadius = '50%';
+    closeButton.style.width = '40px';
+    closeButton.style.height = '40px';
+    closeButton.style.fontSize = '20px';
+    closeButton.style.cursor = 'pointer';
+    closeButton.style.zIndex = '10000';
+
+    closeButton.onclick = () => {
+      document.body.removeChild(modal);
+    };
+
+    modal.onclick = (e) => {
+      if (e.target === modal) {
+        document.body.removeChild(modal);
+      }
+    };
+
+    modal.appendChild(iframe);
+    modal.appendChild(closeButton);
+    document.body.appendChild(modal);
   };
 
   return {
