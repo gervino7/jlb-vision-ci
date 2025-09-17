@@ -27,7 +27,7 @@ serve(async (req) => {
     const openaiApiKey = Deno.env.get('ANTHROPIC_API_KEY');
     
     if (!openaiApiKey) {
-      throw new Error('Clé API Anthropic non configurée');
+      throw new Error('Clé API OPENAI non configurée');
     }
 
     // Obtenir l'IP du client pour le rate limiting
