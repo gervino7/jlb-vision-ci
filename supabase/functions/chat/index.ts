@@ -11,10 +11,11 @@ const corsHeaders = {
   'Referrer-Policy': 'strict-origin-when-cross-origin'
 };
 
-// Rate limiting - simple in-memory store (pour démonstration)
-const rateLimitStore = new Map();
-const RATE_LIMIT_WINDOW = 60000; // 1 minute
-const RATE_LIMIT_MAX_REQUESTS = 10;
+// Enhanced rate limiting implementation
+const rateLimitStore = new Map<string, { count: number; resetTime: number }>();
+const RATE_LIMIT_WINDOW = 60 * 1000; // 1 minute
+const RATE_LIMIT_MAX_REQUESTS = 5; // Reduced from 10 to 5 for better security
+const AUTHENTICATED_MAX_REQUESTS = 20; // Higher limit for authenticated users
 
 serve(async (req) => {
   // Handle CORS preflight requests
@@ -23,33 +24,70 @@ serve(async (req) => {
   }
 
   try {
-    // Récupérer la clé API Anthropic depuis les variables d'environnement
+    // Initialize Supabase client for auth verification
+    const supabase = createClient(
+      Deno.env.get('SUPABASE_URL') ?? '',
+      Deno.env.get('SUPABASE_ANON_KEY') ?? ''
+    );
+
+    // Get user from JWT token
+    const authHeader = req.headers.get('authorization');
+    let userId = null;
+    let isAuthenticated = false;
+
+    if (authHeader) {
+      try {
+        const token = authHeader.replace('Bearer ', '');
+        const { data: { user } } = await supabase.auth.getUser(token);
+        if (user) {
+          userId = user.id;
+          isAuthenticated = true;
+        }
+      } catch (error) {
+        console.error('Auth error:', error);
+      }
+    }
+
+    // Get API key from environment
     const openaiApiKey = Deno.env.get('ANTHROPIC_API_KEY');
     
     if (!openaiApiKey) {
       throw new Error('Clé API OPENAI non configurée');
     }
 
-    // Obtenir l'IP du client pour le rate limiting
-    const clientIP = req.headers.get('x-forwarded-for') || 'unknown';
-    
-    // Vérifier le rate limiting
+    // Enhanced rate limiting with user-based limits
     const now = Date.now();
-    const clientRequests = rateLimitStore.get(clientIP) || [];
-    const recentRequests = clientRequests.filter((time: number) => now - time < RATE_LIMIT_WINDOW);
+    const rateLimitKey = userId || req.headers.get('cf-connecting-ip') || 
+                         req.headers.get('x-forwarded-for') || 'unknown';
+    const maxRequests = isAuthenticated ? AUTHENTICATED_MAX_REQUESTS : RATE_LIMIT_MAX_REQUESTS;
     
-    if (recentRequests.length >= RATE_LIMIT_MAX_REQUESTS) {
-      return new Response(JSON.stringify({ 
-        error: 'Trop de requêtes. Veuillez patienter avant de réessayer.' 
-      }), {
-        status: 429,
-        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-      });
+    const current = rateLimitStore.get(rateLimitKey);
+
+    if (current) {
+      if (now < current.resetTime) {
+        if (current.count >= maxRequests) {
+          return new Response(
+            JSON.stringify({ 
+              error: isAuthenticated ? 
+                'Limite de requêtes atteinte. Veuillez patienter.' : 
+                'Trop de requêtes. Connectez-vous pour une limite plus élevée.' 
+            }),
+            { 
+              status: 429, 
+              headers: { ...corsHeaders, 'Content-Type': 'application/json' } 
+            }
+          );
+        }
+        current.count++;
+      } else {
+        rateLimitStore.set(rateLimitKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
+      }
+    } else {
+      rateLimitStore.set(rateLimitKey, { count: 1, resetTime: now + RATE_LIMIT_WINDOW });
     }
-    
-    // Enregistrer cette requête
-    recentRequests.push(now);
-    rateLimitStore.set(clientIP, recentRequests);
+
+    // Log request for monitoring
+    console.log(`Chat request from ${isAuthenticated ? 'user:' + userId : 'anonymous:' + rateLimitKey}, count: ${current?.count || 1}/${maxRequests}`);
 
     const { message, systemPrompt } = await req.json();
 
