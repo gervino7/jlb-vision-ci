@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm } from 'react-hook-form';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -6,8 +6,9 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 import { Card } from '@/components/ui/card';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { MessageCircle, Send, Phone, Mail, MapPin, Calendar } from 'lucide-react';
+import { MessageCircle, Send, Phone, Mail, MapPin, Calendar, Clock, Users } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
+import { useCalendly } from '@/hooks/useCalendly';
 
 interface FormData {
   name: string;
@@ -20,6 +21,7 @@ export const ContactSection = () => {
   const { register, handleSubmit, reset, formState: { errors } } = useForm<FormData>();
   const { toast } = useToast();
   const [activeTab, setActiveTab] = useState('message');
+  const { loading, eventTypes, getEventTypes, openCalendlyPopup } = useCalendly();
 
   const onSubmit = (data: FormData) => {
     // Simuler l'envoi du formulaire
@@ -30,6 +32,11 @@ export const ContactSection = () => {
     });
     reset();
   };
+
+  // Charger les types d'événements Calendly au montage du composant
+  useEffect(() => {
+    getEventTypes();
+  }, []);
 
   const whatsappMessage = encodeURIComponent(
     "Bonjour M. Jean-Louis Billon, je vous contacte via votre site web officiel. J'aimerais échanger avec vous concernant vos projets pour la Côte d'Ivoire."
@@ -166,44 +173,99 @@ export const ContactSection = () => {
                 </div>
 
                 <div className="space-y-4">
-                  <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20">
-                    <div className="flex items-center gap-3 mb-4">
-                      <Calendar className="h-6 w-6 text-primary" />
-                      <h4 className="font-semibold text-foreground">Calendly - Réservation en ligne</h4>
+                  {/* Liste des types d'événements depuis l'API Calendly */}
+                  {loading ? (
+                    <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20">
+                      <div className="flex items-center justify-center">
+                        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
+                        <span className="ml-3 text-muted-foreground">Chargement des créneaux disponibles...</span>
+                      </div>
                     </div>
-                    <p className="text-muted-foreground mb-4">
-                      Choisissez un créneau qui vous convient et réservez directement votre rendez-vous.
-                    </p>
-                    <Button 
-                      size="lg"
-                      className="w-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
-                      onClick={() => {
-                        // Ouvrir Calendly dans un nouvel onglet
-                        window.open('https://calendly.com/jeanllouisbillon', '_blank', 'noopener,noreferrer');
-                      }}
-                    >
-                      <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
-                      Réserver un rendez-vous
-                    </Button>
-                  </div>
+                  ) : eventTypes.length > 0 ? (
+                    <>
+                      {eventTypes.map((eventType, index) => (
+                        <div 
+                          key={eventType.uri} 
+                          className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20 hover:border-primary/40 transition-colors duration-300"
+                        >
+                          <div className="flex items-start justify-between mb-4">
+                            <div className="flex items-center gap-3">
+                              <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
+                                index === 0 ? 'bg-primary text-primary-foreground' :
+                                index === 1 ? 'bg-secondary text-secondary-foreground' :
+                                'bg-accent text-accent-foreground'
+                              }`}>
+                                <Calendar className="h-5 w-5" />
+                              </div>
+                              <div>
+                                <h4 className="font-semibold text-foreground">{eventType.name}</h4>
+                                {eventType.description_plain && (
+                                  <p className="text-sm text-muted-foreground mt-1 line-clamp-2">
+                                    {eventType.description_plain}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                              <Clock className="h-4 w-4" />
+                              <span>{eventType.duration} min</span>
+                            </div>
+                          </div>
 
-                  <div className="bg-gradient-to-r from-secondary/10 to-accent/10 rounded-lg p-6 border border-secondary/20">
-                    <h4 className="font-semibold text-foreground mb-2">Types de rendez-vous disponibles :</h4>
-                    <ul className="text-muted-foreground space-y-2">
-                      <li className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-primary rounded-full"></div>
-                        Consultation politique (30 min)
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-secondary rounded-full"></div>
-                        Rencontre économique (45 min)
-                      </li>
-                      <li className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-accent rounded-full"></div>
-                        Discussion communautaire (60 min)
-                      </li>
-                    </ul>
-                  </div>
+                          <Button 
+                            size="lg"
+                            className="w-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
+                            onClick={() => openCalendlyPopup(eventType.booking_url)}
+                          >
+                            <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                            Réserver ce type de rendez-vous
+                          </Button>
+                        </div>
+                      ))}
+                    </>
+                  ) : (
+                    <>
+                      {/* Fallback avec bouton générique si l'API n'est pas configurée */}
+                      <div className="bg-gradient-to-r from-primary/10 to-secondary/10 rounded-lg p-6 border border-primary/20">
+                        <div className="flex items-center gap-3 mb-4">
+                          <Calendar className="h-6 w-6 text-primary" />
+                          <h4 className="font-semibold text-foreground">Calendly - Réservation en ligne</h4>
+                        </div>
+                        <p className="text-muted-foreground mb-4">
+                          Choisissez un créneau qui vous convient et réservez directement votre rendez-vous.
+                        </p>
+                        <Button 
+                          size="lg"
+                          className="w-full bg-gradient-to-r from-primary to-primary-glow hover:shadow-presidential transition-all duration-300 group"
+                          onClick={() => {
+                            // Ouvrir Calendly dans un nouvel onglet
+                            window.open('https://calendly.com/jeanllouisbillon', '_blank', 'noopener,noreferrer');
+                          }}
+                        >
+                          <Calendar className="mr-2 h-5 w-5 group-hover:scale-110 transition-transform duration-300" />
+                          Réserver un rendez-vous
+                        </Button>
+                      </div>
+
+                      <div className="bg-gradient-to-r from-secondary/10 to-accent/10 rounded-lg p-6 border border-secondary/20">
+                        <h4 className="font-semibold text-foreground mb-2">Types de rendez-vous disponibles :</h4>
+                        <ul className="text-muted-foreground space-y-2">
+                          <li className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-primary rounded-full"></div>
+                            Consultation politique (30 min)
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-secondary rounded-full"></div>
+                            Rencontre économique (45 min)
+                          </li>
+                          <li className="flex items-center gap-2">
+                            <div className="w-2 h-2 bg-accent rounded-full"></div>
+                            Discussion communautaire (60 min)
+                          </li>
+                        </ul>
+                      </div>
+                    </>
+                  )}
                 </div>
               </TabsContent>
             </Tabs>
