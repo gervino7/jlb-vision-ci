@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { X, ZoomIn } from 'lucide-react';
-import portraitImage from '@/assets/jean-louis-billon-portrait.jpg';
+import portraitImage from '@/assets/jean-louis-billon-portrait-officiel.jpg';
 import footballImage from '@/assets/jlb-football-sifca.jpg';
 import ordinateurImage from '@/assets/jlb-remise-ordinateur.jpg';
 import diplomeImage from '@/assets/jlb-remise-diplome.jpg';

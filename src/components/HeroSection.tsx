@@ -2,7 +2,7 @@ import React from 'react';
 import { ArrowRight, Star, Users, Briefcase } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { CountdownTimer } from '@/components/ui/countdown-timer';
-import portraitImage from '@/assets/jean-louis-billon-portrait.jpg';
+import portraitImage from '@/assets/jean-louis-billon-portrait-officiel.jpg';
 
 export const HeroSection = () => {
   const scrollToSection = (href: string) => {
