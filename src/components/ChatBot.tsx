@@ -6,6 +6,7 @@ import { Card } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { MessageSquare, Send, Mic, MicOff, Phone, Calendar, Users, Building2, X, Minimize2, Maximize2 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { supabase } from '@/integrations/supabase/client';
 
 interface Message {
   id: string;
@@ -109,31 +110,21 @@ export const ChatBot: React.FC<ChatBotProps> = ({ isOpen, onToggle }) => {
     setIsLoading(true);
 
     try {
-      const response = await fetch('/functions/v1/chat', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
+      const { data, error } = await supabase.functions.invoke('chat', {
+        body: {
           message: messageToSend,
           apiKey: apiKey,
-          systemPrompt: getSystemPrompt()
-        }),
+          systemPrompt: getSystemPrompt(),
+        },
       });
 
-      if (!response.ok) {
-        throw new Error('Erreur de communication avec le serveur');
-      }
-
-      const data = await response.json();
-      
-      if (data.error) {
-        throw new Error(data.error);
+      if (error) {
+        throw new Error(error.message || 'Erreur de communication avec le serveur');
       }
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),
-        content: data.response,
+        content: (data as any)?.response,
         isUser: false,
         timestamp: new Date()
       };
