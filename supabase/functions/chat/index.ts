@@ -22,6 +22,13 @@ serve(async (req) => {
   }
 
   try {
+    // Obtenir la clé API depuis les secrets Supabase
+    const anthropicApiKey = Deno.env.get('ANTHROPIC_API_KEY');
+    
+    if (!anthropicApiKey) {
+      throw new Error('Clé API Anthropic non configurée');
+    }
+
     // Obtenir l'IP du client pour le rate limiting
     const clientIP = req.headers.get('x-forwarded-for') || 'unknown';
     
@@ -43,15 +50,11 @@ serve(async (req) => {
     recentRequests.push(now);
     rateLimitStore.set(clientIP, recentRequests);
 
-    const { message, apiKey, systemPrompt } = await req.json();
+    const { message, systemPrompt } = await req.json();
 
     // Validation des entrées
     if (!message || typeof message !== 'string') {
       throw new Error('Message requis et doit être une chaîne de caractères');
-    }
-    
-    if (!apiKey || typeof apiKey !== 'string' || !apiKey.startsWith('sk-')) {
-      throw new Error('Clé API invalide');
     }
     
     if (message.length > 4000) {
@@ -68,7 +71,7 @@ serve(async (req) => {
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
-        'x-api-key': apiKey,
+        'x-api-key': anthropicApiKey,
         'Content-Type': 'application/json',
         'anthropic-version': '2023-06-01',
       },
